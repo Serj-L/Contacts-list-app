@@ -1,0 +1,56 @@
+.container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  background-color: #377dff;
+  padding: 10px 20px;
+  transition: 0.4s;
+  z-index: 50;
+}
+
+.container[data-is-active='true'] {
+  visibility: visible;
+}
+
+.container[data-is-active='false'] {
+  visibility: hidden;
+}
+
+.container[data-manual-close='true'] {
+  cursor: pointer;
+}
+
+.container[data-position='top'],
+.container[data-position='bottom'] {
+  max-width: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.container[data-position='top'] {
+  top: 0;
+  border-radius: 0 0 6px 6px;
+}
+
+.container[data-position='bottom'] {
+  bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+
+.container[data-position='left'],
+.container[data-position='right'] {
+  max-width: 20%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.container[data-position='left'] {
+  left: 0;
+  border-radius: 0 6px 6px 0;
+}
+
+.container[data-position='right'] {
+  right: 0;
+  border-radius: 6px 0 0 6px;
+}
