@@ -43,6 +43,7 @@ function ConfirmModal({
           <div className={styles.modalContent}>
             {children}
           </div>
+          <div className={styles.hrLine}><hr /></div>
           <div className={styles.modalFooter}>
             <button
               className={styles.btn}

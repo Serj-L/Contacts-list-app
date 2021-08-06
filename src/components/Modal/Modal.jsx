@@ -12,6 +12,7 @@ function Modal({
   rejectBtnHandler,
   rejectBtnTitle,
   children,
+  componentUnmountFunc,
 }) {
   const { isModalOpen, isModalAcceptBtnDissabled } = useSelector((state) => state.contacts);
   const reduxDispatch = useDispatch();
@@ -19,8 +20,11 @@ function Modal({
   useEffect(()=> {
     if (!isModalOpen) return;
     document.body.style.overflow = 'hidden';
-    return () => document.body.style.overflow = 'auto';
-  }, [isModalOpen]);
+    return () => {
+      if (componentUnmountFunc) componentUnmountFunc();
+      document.body.style.overflow = 'auto';
+    };
+  }, [componentUnmountFunc, isModalOpen]);
 
   return isModalOpen ?
     (
@@ -38,6 +42,7 @@ function Modal({
           <div className={styles.modalContent}>
             {children}
           </div>
+          <div className={styles.hrLine}><hr /></div>
           <div className={styles.modalFooter}>
             <button
               className={styles.btn}

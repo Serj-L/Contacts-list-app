@@ -128,3 +128,8 @@
 .btnDanger:hover::after {
   transform: scale(1);
 }
+
+.hrLine {
+  width: 95%;
+  display: block;
+}

@@ -20,7 +20,7 @@ import {
 import styles from './Form.module.css';
 
 const formValidator = (name, email, phone, isEmailValid, isPhoneValid) => {
-  return name && (((isPhoneValid && !email) || (isEmailValid && !phone) ) || (phone && email && isEmailValid && isPhoneValid)) ? false : true;
+  return name || (((isPhoneValid && !email) || (isEmailValid && !phone)) || (phone && email && isEmailValid && isPhoneValid)) ? false : true;
 };
 
 const emailValidator = (email, isPhoneValid, firstName, lastName) => {
@@ -194,7 +194,6 @@ function Form() {
           />
         </label>
       </ConfirmModal>
-      <hr />
     </div>
   );
 }

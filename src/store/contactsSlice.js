@@ -21,6 +21,8 @@ export const launchSnackbar = createAsyncThunk(
     }, snackbarParams.options.duration);
   });
 
+const contactsList = localStorage.getItem('contacts') ? JSON.parse(localStorage.getItem('contacts')) : [];
+
 const contactsSlice = createSlice({
   name: 'contacts',
 
@@ -41,6 +43,9 @@ const contactsSlice = createSlice({
     },
     additionalFormFields: [],
     additionalFormFieldTitle: '',
+    additionalFormFieldValue: '',
+    contactsList,
+    currentContact: {},
     snackbar: {
       message: 'Hello world!',
       options: {
@@ -56,10 +61,6 @@ const contactsSlice = createSlice({
   },
 
   reducers: {
-    setInitialContactsList(state, action) {
-      state.contactsList = action.payload.contactsList;
-    },
-
     changeModalStatus(state, action) {
       state.isModalOpen = action.payload.modalStatus;
     },
@@ -98,8 +99,16 @@ const contactsSlice = createSlice({
       state.additionalFormFieldTitle = action.payload.additionalFormFieldTitle;
     },
 
+    addFieldValue(state, action) {
+      state.additionalFormFieldValue = action.payload.additionalFormFieldValue;
+    },
+
     clrFieldTitle(state) {
       state.additionalFormFieldTitle = '';
+    },
+
+    clrFieldValue(state) {
+      state.additionalFormFieldValue = '';
     },
 
     addFieldToForm(state, action) {
@@ -123,8 +132,12 @@ const contactsSlice = createSlice({
       state.contactsList.push(contactInfo);
     },
 
+    setCurrentContact(state, action) {
+      state.currentContact = state.contactsList.filter(contact => contact.id === action.payload.contactId)[0];
+    },
+
     deleteContact(state, action) {
-      state.contactsList = state.contactsList.filter((id) => id === action.payload.contactId);
+      state.contactsList = state.contactsList.filter(contact => contact.id !== action.payload.contactId);
     },
 
     setUpSnackbar(state, action) {
@@ -156,7 +169,6 @@ const contactsSlice = createSlice({
 });
 
 export const {
-  setInitialContactsList,
   changeModalStatus,
   changeConfirmModalStatus,
   addContactInfo,
@@ -166,10 +178,13 @@ export const {
   changeModalAcceptBtnStatus,
   changeConfirmModalAcceptBtnStatus,
   addFieldTitle,
+  addFieldValue,
   clrFieldTitle,
+  clrFieldValue,
   addFieldToForm,
   deleteFieldFromForm,
   addContact,
+  setCurrentContact,
   deleteContact,
   setUpSnackbar,
   openSnackbar,

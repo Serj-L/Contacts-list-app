@@ -1,4 +1,9 @@
 
+.addContactWrapper {
+display: flex;
+justify-content: flex-end;
+}
+
 .title {
   font-size: 24px;
   font-weight: bold;

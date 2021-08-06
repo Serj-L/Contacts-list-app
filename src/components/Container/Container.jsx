@@ -1,32 +1,20 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { setInitialContactsList } from '../../store/contactsSlice';
+import { useSelector } from 'react-redux';
 
 import { Snackbar } from '../../components';
 
 import styles from './Container.module.css';
 
-function localStorageSet(key = 'contacts', value = []) {
+function localStorageSet(value = [], key = 'contacts') {
   localStorage[key] = JSON.stringify(value);
 }
 
-function localStorageGet(key = 'contacts') {
-  return JSON.parse(localStorage.getItem(key));
-}
-
 const Container = ({ children }) => {
-  const reduxDispatch = useDispatch();
-  const contacts = useSelector((state) => state.contacts.contactsList);
+  const contactsList = useSelector((state) => state.contacts.contactsList);
 
   useEffect(() => {
-    const list = localStorageGet();
-    reduxDispatch(setInitialContactsList({ contactsList: list ? list : []}));
-  }, [reduxDispatch]);
-
-  useEffect(() => {
-    localStorageSet('contacts', contacts);
-  }, [contacts]);
+    localStorageSet(contactsList);
+  }, [contactsList]);
 
   return (
     <div className={styles.container}>

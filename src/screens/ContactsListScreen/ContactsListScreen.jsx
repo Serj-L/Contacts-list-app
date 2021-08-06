@@ -1,16 +1,29 @@
-import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+
+import {
+  changeConfirmModalStatus,
+  changeConfirmModalAcceptBtnStatus,
+  setCurrentContact,
+  deleteContact,
+} from '../../store/contactsSlice';
+
+import { ConfirmModal, AddContact } from '../../components';
 
 import styles from './ContactsListScreen.module.css';
 
-const ContactsListScreen = () => {
-  const contacts = useSelector((state) => state.contacts.contactsList);
+const ContactsListScreen = ({ history }) => {
+  const reduxDispatch = useDispatch();
+  const contactsList = useSelector((state) => state.contacts.contactsList);
+  const currentContact = useSelector((state) => state.contacts.currentContact);
 
   return (
     <div className={styles.container}>
+      <div className={styles.addContactWrapper}>
+        <AddContact />
+      </div>
       <h1 className={styles.title}>Contacts list</h1>
-      {contacts ?
-        contacts.map((contact, idx) => {
+      {contactsList ?
+        contactsList.map((contact, idx) => {
           return (
             <div
               className={styles.listWrapper}
@@ -22,19 +35,20 @@ const ContactsListScreen = () => {
               <div className={styles.btnWrapper}>
                 <button
                   className={styles.btn}
-                  onClick = {() => console.log('edit')}
+                  onClick = {() => {
+                    reduxDispatch(setCurrentContact({ contactId: contact.id }));
+                    history.push('/info');
+                  }}
                 >
-                Edit
-                </button>
-                <button
-                  className={styles.btn}
-                  onClick = {() => console.log('View details')}
-                >
-                View details
+                  View details / Edit
                 </button>
                 <button
                   className={styles.btnDanger}
-                  onClick = {() => console.log('delete contact')}
+                  onClick = {() => {
+                    reduxDispatch(setCurrentContact({ contactId: contact.id }));
+                    reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: true }));
+                    reduxDispatch(changeConfirmModalAcceptBtnStatus({ confirmModalStatus: false }));
+                  }}
                 >
                 Delete
                 </button>
@@ -44,12 +58,19 @@ const ContactsListScreen = () => {
           );
         }) : <h3>Contats list is empty</h3>
       }
-      <NavLink
-        to="/info"
-        className={styles.navlink}
+      <ConfirmModal
+        modalTitle = {'Delete contact'}
+        acceptBtnHandler = {() => {
+          reduxDispatch(deleteContact({ contactId: currentContact.id }));
+          reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: false }));
+        }}
+        acceptBtnTitle = {'Delete'}
+        rejectBtnHandler = {() => reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: false }))}
+        rejectBtnTitle = {'Cancel'}
       >
-        Contact details information...
-      </NavLink>
+        <h3>Delete contact {currentContact.firstName} {currentContact.lastName} ?</h3>
+      </ConfirmModal>
+
     </div>
   );
 };

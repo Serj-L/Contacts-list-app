@@ -1,7 +1,5 @@
 import { NavLink } from 'react-router-dom';
 
-import { AddContact } from '../../components';
-
 import styles from './Header.module.css';
 
 function Header() {
@@ -17,7 +15,6 @@ function Header() {
         Contacts List App
         </NavLink>
       </h1>
-      <AddContact />
     </header>
   );
 }
