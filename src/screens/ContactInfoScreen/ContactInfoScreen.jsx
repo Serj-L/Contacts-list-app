@@ -6,31 +6,37 @@ import {
   changeModalAcceptBtnStatus,
   addFieldTitle,
   addFieldValue,
-  clrFieldTitle,
-  clrFieldValue,
+  clrAddFieldValues,
 
 } from '../../store/contactsSlice';
 
-import { ConfirmModal, Modal } from '../../components';
+import { Modal1 } from '../../components';
 
 import styles from './ContactInfoScreen.module.css';
 
-const ContactInfoScreen = () => {
+const ContactInfoScreen = ({ history }) => {
   const reduxDispatch = useDispatch();
   const currentContact = useSelector((state) => state.contacts.currentContact);
   const fieldTitle = useSelector((state) => state.contacts.additionalFormFieldTitle);
   const fieldValue = useSelector((state) => state.contacts.additionalFormFieldTitle);
   const additionalFields = useSelector((state) => state.contacts.additionalFormFields);
   const clearAddField = useCallback(() => {
-    reduxDispatch(clrFieldTitle());
-    reduxDispatch(clrFieldValue());
+    reduxDispatch(clrAddFieldValues());
   },[reduxDispatch]);
+  const clearAddFieldValues = useCallback(() => reduxDispatch(clrAddFieldValues()), [reduxDispatch]);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Contact {currentContact.firstName} {currentContact.lastName} details</h1>
+    <div className={styles.controlsWrapper}>
+      <button
+        className={styles.btn}
+        onClick = {() => history.push('/')}
+      >
+        Back to contacts list
+      </button>
+      <h1 className={styles.title}>Contact {currentContact.name} {currentContact.surname} details</h1>
       <form >
         {Object.entries(currentContact).map(contact => {
+          if (contact[0] === 'selected') return null;
           return (
             <label
               className={styles.label}
@@ -39,7 +45,7 @@ const ContactInfoScreen = () => {
               {contact[0]}:
               <div className={styles.addInputsWrapper}>
                 <input
-                  className={styles.input}
+                  className={styles.contactInfoInput}
                   type='text'
                   placeholder={contact[0]}
                   name={contact[0]}
@@ -70,7 +76,7 @@ const ContactInfoScreen = () => {
       </form>
       <button
         className={styles.btn}
-        onClick = {() => reduxDispatch(changeModalStatus({ modalStatus: true }))}
+        onClick = {() => reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: true }))}
       >
         Add field
       </button>
@@ -91,16 +97,20 @@ const ContactInfoScreen = () => {
           Undo
         </button>
       </div>
-      <Modal
+      <Modal1
         modalTitle = {'Add new field'}
         acceptBtnHandler = {() => {
-          /* reduxDispatch(addFieldToForm({ fieldName: fieldTitle })); */
-          reduxDispatch(changeModalStatus({ modalStatus: false }));
+          //reduxDispatch(addFieldToForm({ fieldTitle: fieldTitle, fieldValue: fieldValue }));
+          reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
         }}
         acceptBtnTitle = {'Add field'}
-        rejectBtnHandler = {() => reduxDispatch(changeModalStatus({ modalStatus: false }))}
+        rejectBtnHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
+        }}
         rejectBtnTitle = {'Cancel'}
-        componentUnmountFunc = {clearAddField}
+        componentUnmountFunc = {clearAddFieldValues}
       >
         <label
           className={styles.label}
@@ -114,7 +124,7 @@ const ContactInfoScreen = () => {
             value={fieldTitle}
             onChange = {(e) => {
               reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              reduxDispatch(changeModalAcceptBtnStatus({ acceptBtnStatus: e.target.value ? false : true }));
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: e.target.value ? false : true }));
             }}
           />
         </label>
@@ -129,12 +139,12 @@ const ContactInfoScreen = () => {
             name='fieldValue'
             value={fieldValue}
             onChange = {(e) => {
-              reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              reduxDispatch(changeModalAcceptBtnStatus({ acceptBtnStatus: e.target.value ? false : true }));
+              reduxDispatch(addFieldValue({ additionalFormFieldValue: e.target.value }));
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: (e.target.value && fieldTitle) || fieldTitle ? false : true }));
             }}
           />
         </label>
-      </Modal>
+      </Modal1>
     </div>
   );
 };

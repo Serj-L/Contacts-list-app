@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { changeModalStatus } from '../../store/contactsSlice';
+import { changeModalStatus, changeModalAcceptBtnStatus } from '../../store/contactsSlice';
 
 import styles from './Modal.module.css';
 
-function Modal({
+function Modal1({
   modalTitle,
   acceptBtnHandler,
   acceptBtnTitle,
@@ -18,15 +18,15 @@ function Modal({
   const reduxDispatch = useDispatch();
 
   useEffect(()=> {
-    if (!isModalOpen) return;
+    if (!isModalOpen.modal1) return;
     document.body.style.overflow = 'hidden';
     return () => {
       if (componentUnmountFunc) componentUnmountFunc();
-      document.body.style.overflow = 'auto';
+      if (Object.values(isModalOpen).filter(el => el === true).length < 2) document.body.style.overflow = 'auto';
     };
-  }, [componentUnmountFunc, isModalOpen]);
+  }, [isModalOpen, componentUnmountFunc, reduxDispatch]);
 
-  return isModalOpen ?
+  return isModalOpen.modal1 ?
     (
       <div className={styles.modalWrapper}>
         <div className={styles.modal}>
@@ -34,7 +34,10 @@ function Modal({
             <h2 className={styles.modalTitle}>{modalTitle}</h2>
             <button
               className={styles.btnClose}
-              onClick = {() => reduxDispatch(changeModalStatus({ modalStatus: false }))}
+              onClick = {() => {
+                reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
+              }}
             >
               <span className={styles.closeSymb}>&times;</span>
             </button>
@@ -46,7 +49,7 @@ function Modal({
           <div className={styles.modalFooter}>
             <button
               className={styles.btn}
-              disabled={isModalAcceptBtnDissabled}
+              disabled={isModalAcceptBtnDissabled.modal1}
               onClick = {acceptBtnHandler}
             >
               {acceptBtnTitle}
@@ -61,10 +64,14 @@ function Modal({
         </div>
         <div
           className={styles.modalLayout}
-          onClick = {() => reduxDispatch(changeModalStatus({ modalStatus: false }))}
-        ></div>
+          onClick = {() => {
+            reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
+          }}
+        >
+        </div>
       </div>
     ) : null;
 }
 
-export default Modal;
+export default Modal1;

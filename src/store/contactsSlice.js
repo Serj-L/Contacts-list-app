@@ -27,13 +27,23 @@ const contactsSlice = createSlice({
   name: 'contacts',
 
   initialState: {
-    isModalOpen: false,
-    isConfirmModalOpen: false,
-    isModalAcceptBtnDissabled: true,
-    isConfirmModalAcceptBtnDissabled: true,
+    isModalOpen: {
+      modal1: false,
+      modal2: false,
+      modal3: false,
+      modal4: false,
+      modal5: false,
+    },
+    isModalAcceptBtnDissabled: {
+      modal1: true,
+      modal2: true,
+      modal3: true,
+      modal4: true,
+      modal5: true,
+    },
     addContactInfo: {
-      firstName: '',
-      lastName: '',
+      name: '',
+      surname: '',
       email: '',
       phone: '',
     },
@@ -44,6 +54,7 @@ const contactsSlice = createSlice({
     additionalFormFields: [],
     additionalFormFieldTitle: '',
     additionalFormFieldValue: '',
+    currentAdditionalField: {},
     contactsList,
     currentContact: {},
     snackbar: {
@@ -62,11 +73,11 @@ const contactsSlice = createSlice({
 
   reducers: {
     changeModalStatus(state, action) {
-      state.isModalOpen = action.payload.modalStatus;
+      state.isModalOpen[action.payload.key] = action.payload.modalStatus;
     },
 
-    changeConfirmModalStatus(state, action) {
-      state.isConfirmModalOpen = action.payload.confirmModalStatus;
+    changeModalAcceptBtnStatus(state, action) {
+      state.isModalAcceptBtnDissabled[action.payload.key] = action.payload.acceptBtnStatus;
     },
 
     addContactInfo(state, action) {
@@ -79,20 +90,12 @@ const contactsSlice = createSlice({
 
     changePhoneValid(state, action) {
       state.isInputsValid.phone = action.payload.phone;
-      state.isModalAcceptBtnDissabled = action.payload.acceptBtnStatus;
+      state.isModalAcceptBtnDissabled[action.payload.key] = action.payload.acceptBtnStatus;
     },
 
     changeEmailValid(state, action) {
       state.isInputsValid.email = action.payload.email;
-      state.isModalAcceptBtnDissabled = action.payload.acceptBtnStatus;
-    },
-
-    changeModalAcceptBtnStatus(state, action) {
-      state.isModalAcceptBtnDissabled = action.payload.acceptBtnStatus;
-    },
-
-    changeConfirmModalAcceptBtnStatus(state, action) {
-      state.isConfirmModalAcceptBtnDissabled = action.payload.acceptBtnStatus;
+      state.isModalAcceptBtnDissabled[action.payload.key] = action.payload.acceptBtnStatus;
     },
 
     addFieldTitle(state, action) {
@@ -103,22 +106,24 @@ const contactsSlice = createSlice({
       state.additionalFormFieldValue = action.payload.additionalFormFieldValue;
     },
 
-    clrFieldTitle(state) {
+    clrAddFieldValues(state) {
       state.additionalFormFieldTitle = '';
-    },
-
-    clrFieldValue(state) {
       state.additionalFormFieldValue = '';
     },
 
     addFieldToForm(state, action) {
-      if (!state.additionalFormFields.filter(el => el.key === action.payload.fieldName).length) {
+      if (!state.additionalFormFields.filter(el => el.key === action.payload.fieldTitle).length) {
         state.additionalFormFields.push({
           id: uuid(),
-          key: action.payload.fieldName,
+          key: action.payload.fieldTitle,
         });
-        state.addContactInfo[action.payload.fieldName] = '';
+        state.addContactInfo[action.payload.fieldTitle] = action.payload.fieldValue;
       }
+    },
+
+    setCurrentAddField(state, action) {
+      state.currentAdditionalField.id = action.payload.additionalFormFieldId;
+      state.currentAdditionalField.key = action.payload.additionalFormFieldKey;
     },
 
     deleteFieldFromForm(state, action) {
@@ -127,7 +132,7 @@ const contactsSlice = createSlice({
     },
 
     addContact(state) {
-      const contactInfo = { id: uuid() };
+      const contactInfo = { id: uuid(), selected: false };
       Object.entries(state.addContactInfo).forEach(([key, value]) => contactInfo[key] = value);
       state.contactsList.push(contactInfo);
     },
@@ -136,8 +141,18 @@ const contactsSlice = createSlice({
       state.currentContact = state.contactsList.filter(contact => contact.id === action.payload.contactId)[0];
     },
 
+    setContactSelected(state, action) {
+      state.contactsList = state.contactsList.map(contact => {
+        return contact.id === action.payload.contactId ? { ...contact, selected: !contact.selected } : contact;
+      });
+    },
+
     deleteContact(state, action) {
       state.contactsList = state.contactsList.filter(contact => contact.id !== action.payload.contactId);
+    },
+
+    deleteSelectedContacts(state) {
+      state.contactsList = state.contactsList.filter(contact => contact.selected !== true);
     },
 
     setUpSnackbar(state, action) {
@@ -170,22 +185,22 @@ const contactsSlice = createSlice({
 
 export const {
   changeModalStatus,
-  changeConfirmModalStatus,
+  changeModalAcceptBtnStatus,
   addContactInfo,
   clearContactInfo,
   changePhoneValid,
   changeEmailValid,
-  changeModalAcceptBtnStatus,
-  changeConfirmModalAcceptBtnStatus,
   addFieldTitle,
   addFieldValue,
-  clrFieldTitle,
-  clrFieldValue,
+  clrAddFieldValues,
   addFieldToForm,
+  setCurrentAddField,
   deleteFieldFromForm,
   addContact,
   setCurrentContact,
+  setContactSelected,
   deleteContact,
+  deleteSelectedContacts,
   setUpSnackbar,
   openSnackbar,
   closeSnackbar,

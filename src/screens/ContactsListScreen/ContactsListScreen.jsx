@@ -1,13 +1,15 @@
 import { useSelector, useDispatch } from 'react-redux';
 
 import {
-  changeConfirmModalStatus,
-  changeConfirmModalAcceptBtnStatus,
+  changeModalStatus,
+  changeModalAcceptBtnStatus,
   setCurrentContact,
+  setContactSelected,
   deleteContact,
+  deleteSelectedContacts,
 } from '../../store/contactsSlice';
 
-import { ConfirmModal, AddContact } from '../../components';
+import { Modal4, Modal5, AddContact } from '../../components';
 
 import styles from './ContactsListScreen.module.css';
 
@@ -18,7 +20,17 @@ const ContactsListScreen = ({ history }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.addContactWrapper}>
+      <div className={styles.controlsWrapper}>
+        <button
+          className={styles.btnDanger}
+          disabled={!contactsList.filter(el => el.selected === true).length}
+          onClick = {() => {
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', modalStatus: false }));
+            reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: true }));
+          }}
+        >
+          Delete selected contacts
+        </button>
         <AddContact />
       </div>
       <h1 className={styles.title}>Contacts list</h1>
@@ -29,10 +41,21 @@ const ContactsListScreen = ({ history }) => {
               className={styles.listWrapper}
               key = {contact.id}
             >
-              <h3 className={styles.contactName}>{idx + 1}. {contact.firstName} {contact.lastName}</h3>
+              <h3 className={styles.contactName}>{idx + 1}. {contact.name} {contact.surname}</h3>
               <p className={styles.contactContacts}>{contact.email ? `E-mail: ${contact.email}` : ''}</p>
               <p className={styles.contactContacts}>{contact.phone ? `Phone: ${contact.phone}` : ''}</p>
               <div className={styles.btnWrapper}>
+                <input
+                  className={styles.checkbox}
+                  type='checkbox'
+                  id={contact.id}
+                  onChange = {() => reduxDispatch(setContactSelected({ contactId: contact.id }))}
+                />
+                <label
+                  className={styles.checkboxLabel}
+                  htmlFor={contact.id}
+                >
+                </label>
                 <button
                   className={styles.btn}
                   onClick = {() => {
@@ -46,8 +69,8 @@ const ContactsListScreen = ({ history }) => {
                   className={styles.btnDanger}
                   onClick = {() => {
                     reduxDispatch(setCurrentContact({ contactId: contact.id }));
-                    reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: true }));
-                    reduxDispatch(changeConfirmModalAcceptBtnStatus({ confirmModalStatus: false }));
+                    reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', modalStatus: false }));
+                    reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: true }));
                   }}
                 >
                 Delete
@@ -58,19 +81,38 @@ const ContactsListScreen = ({ history }) => {
           );
         }) : <h3>Contats list is empty</h3>
       }
-      <ConfirmModal
+      <Modal4
         modalTitle = {'Delete contact'}
         acceptBtnHandler = {() => {
           reduxDispatch(deleteContact({ contactId: currentContact.id }));
-          reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: false }));
+          reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', modalStatus: true }));
         }}
-        acceptBtnTitle = {'Delete'}
-        rejectBtnHandler = {() => reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: false }))}
-        rejectBtnTitle = {'Cancel'}
+        acceptBtnTitle = {'Yes'}
+        rejectBtnHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', modalStatus: true }));
+        }}
+        rejectBtnTitle = {'No'}
       >
-        <h3>Delete contact {currentContact.firstName} {currentContact.lastName} ?</h3>
-      </ConfirmModal>
-
+        <h3>Delete contact: {currentContact.name} {currentContact.surname} ?</h3>
+      </Modal4>
+      <Modal5
+        modalTitle = {'Delete selected contacts'}
+        acceptBtnHandler = {() => {
+          reduxDispatch(deleteSelectedContacts());
+          reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', modalStatus: true }));
+        }}
+        acceptBtnTitle = {'Yes'}
+        rejectBtnHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', modalStatus: true }));
+        }}
+        rejectBtnTitle = {'No'}
+      >
+        <h3>Delete all selected contacts ?</h3>
+      </Modal5>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 
-.addContactWrapper {
+.controlsWrapper {
 display: flex;
-justify-content: flex-end;
+justify-content: space-between;
 }
 
 .title {
@@ -45,7 +45,9 @@ justify-content: flex-end;
 }
 
 .btn:disabled,
-.btn:disabled::after {
+.btn:disabled::after,
+.btnDanger:disabled,
+.btnDanger:disabled::after {
   background-color: #a7a7a7;
   cursor: unset;
 }
@@ -75,4 +77,47 @@ justify-content: flex-end;
 .btn:hover::after,
 .btnDanger:hover::after {
   transform: scale(1);
+}
+
+.checkboxWrapper {
+  position: relative;
+}
+
+.checkbox {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+
+}
+
+.checkboxLabel {
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+
+.checkboxLabel::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  border: 2px solid #666666;
+  border-radius: 4px;
+  margin-right: 5px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 50% 50%;
+}
+
+.checkbox:checked + .checkboxLabel::before {
+  border-color: #377dff;
+  background-color: #377dff;
+  background-image: url("../../img/check-box-icon.svg");
+  background-size: 90%;
+}
+
+.checkboxLabel:hover::before {
+  cursor: pointer;
 }

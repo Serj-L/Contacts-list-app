@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { changeConfirmModalStatus, changeConfirmModalAcceptBtnStatus } from '../../store/contactsSlice';
+import { changeModalStatus, changeModalAcceptBtnStatus } from '../../store/contactsSlice';
 
 import styles from './Modal.module.css';
 
-function ConfirmModal({
+function Modal2({
   modalTitle,
   acceptBtnHandler,
   acceptBtnTitle,
@@ -14,20 +14,19 @@ function ConfirmModal({
   children,
   componentUnmountFunc,
 }) {
-  const { isConfirmModalOpen, isConfirmModalAcceptBtnDissabled, isModalOpen } = useSelector((state) => state.contacts);
+  const { isModalOpen, isModalAcceptBtnDissabled } = useSelector((state) => state.contacts);
   const reduxDispatch = useDispatch();
 
   useEffect(()=> {
-    if (!isConfirmModalOpen) return;
+    if (!isModalOpen.modal2) return;
     document.body.style.overflow = 'hidden';
     return () => {
       if (componentUnmountFunc) componentUnmountFunc();
-      reduxDispatch(changeConfirmModalAcceptBtnStatus({ acceptBtnStatus: true }));
-      if (!isModalOpen) document.body.style.overflow = 'auto';
+      if (Object.values(isModalOpen).filter(el => el === true).length < 2) document.body.style.overflow = 'auto';
     };
-  }, [isConfirmModalOpen, componentUnmountFunc, isModalOpen, reduxDispatch]);
+  }, [isModalOpen, componentUnmountFunc, reduxDispatch]);
 
-  return isConfirmModalOpen ?
+  return isModalOpen.modal2 ?
     (
       <div className={styles.modalWrapper}>
         <div className={styles.modal}>
@@ -35,7 +34,10 @@ function ConfirmModal({
             <h2 className={styles.modalTitle}>{modalTitle}</h2>
             <button
               className={styles.btnClose}
-              onClick = {() => reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: false }))}
+              onClick = {() => {
+                reduxDispatch(changeModalStatus({ key: 'modal2', confirmModalStatus: false }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+              }}
             >
               <span className={styles.closeSymb}>&times;</span>
             </button>
@@ -47,7 +49,7 @@ function ConfirmModal({
           <div className={styles.modalFooter}>
             <button
               className={styles.btn}
-              disabled={isConfirmModalAcceptBtnDissabled}
+              disabled={isModalAcceptBtnDissabled.modal2}
               onClick = {acceptBtnHandler}
             >
               {acceptBtnTitle}
@@ -62,10 +64,14 @@ function ConfirmModal({
         </div>
         <div
           className={styles.modalLayout}
-          onClick = {() => reduxDispatch(changeConfirmModalStatus({ confirmModalStatus: false }))}
-        ></div>
+          onClick = {() => {
+            reduxDispatch(changeModalStatus({ key: 'modal2', confirmModalStatus: false }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+          }}
+        >
+        </div>
       </div>
     ) : null;
 }
 
-export default ConfirmModal;
+export default Modal2;

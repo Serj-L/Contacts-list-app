@@ -1,8 +1,11 @@
 export { default as Header } from './Header/Header';
 export { default as Footer } from './Footer/Footer';
 export { default as Container } from './Container/Container';
-export { default as Modal } from './Modal/Modal';
-export { default as ConfirmModal } from './Modal/ConfirmModal';
+export { default as Modal1 } from './Modal/Modal1';
+export { default as Modal2 } from './Modal/Modal2';
+export { default as Modal3 } from './Modal/Modal3';
+export { default as Modal4 } from './Modal/Modal4';
+export { default as Modal5 } from './Modal/Modal5';
 export { default as Form } from './Form/Form';
 export { default as AddContact } from './AddContact/AddContact';
 export { default as Snackbar } from './Snackbar/Snackbar';
