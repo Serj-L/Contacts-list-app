@@ -13,25 +13,3 @@ header {
   font-weight: bold;
   color: #ffffff;
 }
-
-.navlink {
-  color: #ffffff;
-  position: relative;
-}
-
-.navlink::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -5px;
-  width: 100%;
-  height: 2px;
-  background-color: #ffffff;
-  transform: scaleX(0);
-  transition: 0.2s ease-in;
-}
-
-.navlink:hover::after {
-  transform: scaleX(1);
-}
-

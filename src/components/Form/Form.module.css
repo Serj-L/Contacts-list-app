@@ -24,8 +24,11 @@
 }
 
 .input[data-is-valid='false'][data-is-empty='false'],
+.input[data-is-uniq='false'][data-is-empty='false'],
 .input[data-is-valid='false'][data-is-empty='false']:hover
-.input[data-is-valid='false'][data-is-empty='false']:focus {
+.input[data-is-valid='false'][data-is-empty='false']:focus,
+.input[data-is-uniq='false'][data-is-empty='false']:hover
+.input[data-is-uniq='false'][data-is-empty='false']:focus {
   border-color: #ff7637;
 }
 
@@ -37,6 +40,14 @@
 
 .label[data-is-valid='false'][data-is-empty='false']::after {
   content: 'Please enter correct data';
+}
+
+.label[data-is-uniq='false'][data-is-empty='false']::after {
+  content: 'Field is already exist';
+}
+
+.label[data-is-valid='false'][data-is-empty='false']::after,
+.label[data-is-uniq='false'][data-is-empty='false']::after {
   display: flex;
   justify-content: center;
   align-items: center;

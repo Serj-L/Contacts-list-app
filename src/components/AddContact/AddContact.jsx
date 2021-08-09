@@ -22,6 +22,7 @@ function AddContact() {
       >
         Add new contact
       </button>
+
       <Modal1
         modalTitle = {'Add new contact'}
         acceptBtnHandler = {() => {
@@ -47,7 +48,9 @@ function AddContact() {
         <div>
           <Form />
         </div>
+
       </Modal1>
+
     </div>
   );
 }

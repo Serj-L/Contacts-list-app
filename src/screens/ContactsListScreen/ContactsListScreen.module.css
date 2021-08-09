@@ -1,7 +1,13 @@
 
 .controlsWrapper {
-display: flex;
-justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 0;
+}
+
+.selectBtns {
+  display: flex;
+  gap: 20px;
 }
 
 .title {

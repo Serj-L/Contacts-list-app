@@ -10,6 +10,7 @@ import {
   changePhoneValid,
   changeEmailValid,
   changeModalAcceptBtnStatus,
+  changeFieldExistStatus,
   addFieldTitle,
   addFieldValue,
   clrAddFieldValues,
@@ -46,6 +47,7 @@ function Form() {
   const reduxDispatch = useDispatch();
   const contact = useSelector((state) => state.contacts.addContactInfo);
   const { phone: isPhoneValid, email: isEmailValid } = useSelector((state) => state.contacts.isInputsValid);
+  const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
   const fieldTitle = useSelector((state) => state.contacts.additionalFormFieldTitle);
   const fieldValue = useSelector((state) => state.contacts.additionalFormFieldValue);
   const currentAddfield = useSelector((state) => state.contacts.currentAdditionalField);
@@ -65,11 +67,11 @@ function Form() {
         <label
           className={styles.label}
         >
-            Name:
+          name:
           <input
             className={styles.input}
             type='text'
-            placeholder='Name'
+            placeholder='name'
             name='name'
             value={contact.name}
             onChange = {(e) => {
@@ -81,11 +83,11 @@ function Form() {
         <label
           className={styles.label}
         >
-            Surname:
+          surname:
           <input
             className={styles.input}
             type='text'
-            placeholder='Surname'
+            placeholder='surname'
             name='surname'
             value={contact.surname}
             onChange = {(e) => {
@@ -99,11 +101,11 @@ function Form() {
           data-is-valid={isEmailValid}
           data-is-empty={contact.email ? 'false' : 'true'}
         >
-            E-mail:
+          email:
           <input
             className={styles.input}
             type='email'
-            placeholder='E-mail'
+            placeholder='email'
             name='email'
             value={contact.email}
             data-is-valid={isEmailValid}
@@ -119,11 +121,11 @@ function Form() {
           data-is-valid={isPhoneValid}
           data-is-empty={contact.phone ? 'false' : 'true'}
         >
-            Phone:
+          phone:
           <input
             className={styles.input}
             type='tel'
-            placeholder='Phone'
+            placeholder='phone'
             name='phone'
             value={contact.phone}
             data-is-valid={isPhoneValid}
@@ -177,6 +179,7 @@ function Form() {
       >
         Add field
       </button>
+
       <Modal2
         modalTitle = {'Add new field'}
         acceptBtnHandler = {() => {
@@ -194,24 +197,34 @@ function Form() {
       >
         <label
           className={styles.label}
+          data-is-uniq={!isFieldExist}
+          data-is-empty={fieldTitle ? 'false' : 'true'}
         >
-            Field title:
+          Field title:
           <input
             className={styles.input}
             type='text'
             placeholder='Field title'
             name='fieldTitle'
             value={fieldTitle}
+            data-is-uniq={!isFieldExist}
+            data-is-empty={fieldTitle ? 'false' : 'true'}
             onChange = {(e) => {
               reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: e.target.value ? false : true }));
+              if (Object.keys(contact).includes(e.target.value)) {
+                reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+              } else {
+                if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: e.target.value ? false : true }));
+              }
             }}
           />
         </label>
         <label
           className={styles.label}
         >
-            Field value:
+          Field value:
           <input
             className={styles.input}
             type='text'
@@ -225,6 +238,7 @@ function Form() {
           />
         </label>
       </Modal2>
+
       <Modal3
         modalTitle = {'Delete field'}
         acceptBtnHandler = {() => {
@@ -240,6 +254,7 @@ function Form() {
       >
         <h3>Delete field: {currentAddfield.key} ?</h3>
       </Modal3>
+
     </div>
   );
 }

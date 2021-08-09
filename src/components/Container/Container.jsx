@@ -18,7 +18,9 @@ const Container = ({ children }) => {
 
   return (
     <div className={styles.container}>
+
       <Snackbar />
+
       {children}
     </div>
   );

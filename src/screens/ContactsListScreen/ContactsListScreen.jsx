@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import {
@@ -5,8 +6,12 @@ import {
   changeModalAcceptBtnStatus,
   setCurrentContact,
   setContactSelected,
+  setAllContactsSelected,
+  changeIsContactsSelected,
+  resetSelectedContacts,
   deleteContact,
   deleteSelectedContacts,
+  initCurrentContactStateHistory,
 } from '../../store/contactsSlice';
 
 import { Modal4, Modal5, AddContact } from '../../components';
@@ -16,24 +21,64 @@ import styles from './ContactsListScreen.module.css';
 const ContactsListScreen = ({ history }) => {
   const reduxDispatch = useDispatch();
   const contactsList = useSelector((state) => state.contacts.contactsList);
+  const { all: allSelected, some: someSelected } = useSelector((state) => state.contacts.isContactsSelected);
   const currentContact = useSelector((state) => state.contacts.currentContact);
+
+  useEffect(() => {
+    const selectedContactsList = contactsList.filter(el => el.selected === true).length;
+    if (selectedContactsList) {
+      if (selectedContactsList === contactsList.length) {
+        reduxDispatch(changeIsContactsSelected(({ key: 'all', value: true })));
+        if (someSelected) reduxDispatch(changeIsContactsSelected(({ key: 'some', value: false })));
+      } else {
+        reduxDispatch(changeIsContactsSelected(({ key: 'some', value: true })));
+        if (allSelected) reduxDispatch(changeIsContactsSelected(({ key: 'all', value: false })));
+      }
+    } else {
+      if (someSelected) reduxDispatch(changeIsContactsSelected(({ key: 'some', value: false })));
+      if (allSelected) reduxDispatch(changeIsContactsSelected(({ key: 'all', value: false })));
+    }
+  }, [contactsList, someSelected, allSelected, reduxDispatch]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.controlsWrapper}>
-        <button
-          className={styles.btnDanger}
-          disabled={!contactsList.filter(el => el.selected === true).length}
-          onClick = {() => {
-            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', modalStatus: false }));
-            reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: true }));
-          }}
-        >
-          Delete selected contacts
-        </button>
-        <AddContact />
-      </div>
       <h1 className={styles.title}>Contacts list</h1>
+      <div className={styles.controlsWrapper}>
+        <div className={styles.selectBtns}>
+          <button
+            className={styles.btn}
+            disabled={allSelected}
+            onClick = {() => {
+              reduxDispatch(setAllContactsSelected());
+            }}
+          >
+          Select all contacts
+          </button>
+          <button
+            className={styles.btn}
+            disabled={allSelected || someSelected ? false : true}
+            onClick = {() => {
+              reduxDispatch(resetSelectedContacts());
+            }}
+          >
+          Unselect contacts
+          </button>
+          <button
+            className={styles.btnDanger}
+            disabled={allSelected || someSelected ? false : true}
+            onClick = {() => {
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', modalStatus: false }));
+              reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: true }));
+            }}
+          >
+          Delete selected contacts
+          </button>
+        </div>
+
+        <AddContact />
+
+      </div>
+
       {contactsList ?
         contactsList.map((contact, idx) => {
           return (
@@ -49,6 +94,7 @@ const ContactsListScreen = ({ history }) => {
                   className={styles.checkbox}
                   type='checkbox'
                   id={contact.id}
+                  checked={contact.selected}
                   onChange = {() => reduxDispatch(setContactSelected({ contactId: contact.id }))}
                 />
                 <label
@@ -60,6 +106,8 @@ const ContactsListScreen = ({ history }) => {
                   className={styles.btn}
                   onClick = {() => {
                     reduxDispatch(setCurrentContact({ contactId: contact.id }));
+                    reduxDispatch(resetSelectedContacts());
+                    reduxDispatch(initCurrentContactStateHistory());
                     history.push('/info');
                   }}
                 >
@@ -73,7 +121,7 @@ const ContactsListScreen = ({ history }) => {
                     reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: true }));
                   }}
                 >
-                Delete
+                  Delete
                 </button>
               </div>
               <hr />
@@ -81,6 +129,7 @@ const ContactsListScreen = ({ history }) => {
           );
         }) : <h3>Contats list is empty</h3>
       }
+
       <Modal4
         modalTitle = {'Delete contact'}
         acceptBtnHandler = {() => {
@@ -97,6 +146,7 @@ const ContactsListScreen = ({ history }) => {
       >
         <h3>Delete contact: {currentContact.name} {currentContact.surname} ?</h3>
       </Modal4>
+
       <Modal5
         modalTitle = {'Delete selected contacts'}
         acceptBtnHandler = {() => {
@@ -113,6 +163,7 @@ const ContactsListScreen = ({ history }) => {
       >
         <h3>Delete all selected contacts ?</h3>
       </Modal5>
+
     </div>
   );
 };
