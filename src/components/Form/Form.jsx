@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { Modal2, Modal3 } from '../../components';
+import { Modal } from '../../components';
 
 import {
   changeModalStatus,
@@ -45,6 +45,7 @@ const phoneValidator = (phone, email, isEmailValid, name, surname, key) => {
 
 function Form() {
   const reduxDispatch = useDispatch();
+  const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const contact = useSelector((state) => state.contacts.addContactInfo);
   const { phone: isPhoneValid, email: isEmailValid } = useSelector((state) => state.contacts.isInputsValid);
   const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
@@ -180,7 +181,9 @@ function Form() {
         Add field
       </button>
 
-      <Modal2
+      <Modal
+        isModalActive = {isModalOpen.modal2}
+        modalKey = {'modal2'}
         modalTitle = {'Add new field'}
         acceptBtnHandler = {() => {
           reduxDispatch(addFieldToForm({ fieldTitle: fieldTitle, fieldValue: fieldValue }));
@@ -211,7 +214,7 @@ function Form() {
             data-is-empty={fieldTitle ? 'false' : 'true'}
             onChange = {(e) => {
               reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              if (Object.keys(contact).includes(e.target.value)) {
+              if (Object.keys(contact).map(key => key.toLowerCase()).includes(e.target.value.toLowerCase())) {
                 reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
                 reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
               } else {
@@ -233,13 +236,15 @@ function Form() {
             value={fieldValue}
             onChange = {(e) => {
               reduxDispatch(addFieldValue({ additionalFormFieldValue: e.target.value }));
-              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: (e.target.value && fieldTitle) || fieldTitle ? false : true }));
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
             }}
           />
         </label>
-      </Modal2>
+      </Modal>
 
-      <Modal3
+      <Modal
+        isModalActive = {isModalOpen.modal3}
+        modalKey = {'modal3'}
         modalTitle = {'Delete field'}
         acceptBtnHandler = {() => {
           reduxDispatch(deleteFieldFromForm({ fieldId: currentAddfield.id, key: currentAddfield.key }));
@@ -253,7 +258,7 @@ function Form() {
         rejectBtnTitle = {'No'}
       >
         <h3>Delete field: {currentAddfield.key} ?</h3>
-      </Modal3>
+      </Modal>
 
     </div>
   );

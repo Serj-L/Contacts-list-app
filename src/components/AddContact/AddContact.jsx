@@ -7,11 +7,12 @@ import {
   launchSnackbar,
 } from '../../store/contactsSlice';
 
-import { Modal1, Form } from '../../components';
+import { Modal, Form } from '../../components';
 import styles from './AddContact.module.css';
 
 function AddContact() {
   const reduxDispatch = useDispatch();
+  const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const contact = useSelector((state) => state.contacts.addContactInfo);
 
   return(
@@ -23,7 +24,9 @@ function AddContact() {
         Add new contact
       </button>
 
-      <Modal1
+      <Modal
+        isModalActive = {isModalOpen.modal1}
+        modalKey = {'modal1'}
         modalTitle = {'Add new contact'}
         acceptBtnHandler = {() => {
           reduxDispatch(addContact());
@@ -49,7 +52,7 @@ function AddContact() {
           <Form />
         </div>
 
-      </Modal1>
+      </Modal>
 
     </div>
   );

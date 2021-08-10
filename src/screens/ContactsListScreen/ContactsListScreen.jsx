@@ -14,12 +14,13 @@ import {
   initCurrentContactStateHistory,
 } from '../../store/contactsSlice';
 
-import { Modal4, Modal5, AddContact } from '../../components';
+import { Modal, AddContact, ScrollTop } from '../../components';
 
 import styles from './ContactsListScreen.module.css';
 
 const ContactsListScreen = ({ history }) => {
   const reduxDispatch = useDispatch();
+  const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const contactsList = useSelector((state) => state.contacts.contactsList);
   const { all: allSelected, some: someSelected } = useSelector((state) => state.contacts.isContactsSelected);
   const currentContact = useSelector((state) => state.contacts.currentContact);
@@ -41,7 +42,8 @@ const ContactsListScreen = ({ history }) => {
   }, [contactsList, someSelected, allSelected, reduxDispatch]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.wrapper}>
+      <ScrollTop />
       <h1 className={styles.title}>Contacts list</h1>
       <div className={styles.controlsWrapper}>
         <div className={styles.selectBtns}>
@@ -78,7 +80,6 @@ const ContactsListScreen = ({ history }) => {
         <AddContact />
 
       </div>
-
       {contactsList ?
         contactsList.map((contact, idx) => {
           return (
@@ -86,9 +87,11 @@ const ContactsListScreen = ({ history }) => {
               className={styles.listWrapper}
               key = {contact.id}
             >
-              <h3 className={styles.contactName}>{idx + 1}. {contact.name} {contact.surname}</h3>
-              <p className={styles.contactContacts}>{contact.email ? `E-mail: ${contact.email}` : ''}</p>
-              <p className={styles.contactContacts}>{contact.phone ? `Phone: ${contact.phone}` : ''}</p>
+              <div className={styles.contactInfo}>
+                <h3 className={styles.contactName}>{idx + 1}. {contact.name} {contact.surname}</h3>
+                <p className={styles.contactContacts}>{contact.email ? `e-mail: ${contact.email}` : ''}</p>
+                <p className={styles.contactContacts}>{contact.phone ? `phone: ${contact.phone}` : ''}</p>
+              </div>
               <div className={styles.btnWrapper}>
                 <input
                   className={styles.checkbox}
@@ -124,13 +127,14 @@ const ContactsListScreen = ({ history }) => {
                   Delete
                 </button>
               </div>
-              <hr />
             </div>
           );
         }) : <h3>Contats list is empty</h3>
       }
 
-      <Modal4
+      <Modal
+        isModalActive = {isModalOpen.modal4}
+        modalKey = {'modal4'}
         modalTitle = {'Delete contact'}
         acceptBtnHandler = {() => {
           reduxDispatch(deleteContact({ contactId: currentContact.id }));
@@ -145,9 +149,11 @@ const ContactsListScreen = ({ history }) => {
         rejectBtnTitle = {'No'}
       >
         <h3>Delete contact: {currentContact.name} {currentContact.surname} ?</h3>
-      </Modal4>
+      </Modal>
 
-      <Modal5
+      <Modal
+        isModalActive = {isModalOpen.modal5}
+        modalKey = {'modal5'}
         modalTitle = {'Delete selected contacts'}
         acceptBtnHandler = {() => {
           reduxDispatch(deleteSelectedContacts());
@@ -162,7 +168,7 @@ const ContactsListScreen = ({ history }) => {
         rejectBtnTitle = {'No'}
       >
         <h3>Delete all selected contacts ?</h3>
-      </Modal5>
+      </Modal>
 
     </div>
   );

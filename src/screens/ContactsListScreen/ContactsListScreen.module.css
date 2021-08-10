@@ -1,8 +1,11 @@
+.wrapper {
+ padding: 20px;
+}
 
 .controlsWrapper {
   display: flex;
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 25px 0;
 }
 
 .selectBtns {
@@ -18,11 +21,33 @@
   text-align: center;
 }
 
+.listWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.listWrapper:not(:last-child) {
+  border-bottom: 2px solid #a7a7a7;
+}
+
+.contactInfo {
+  flex: 1;
+}
+
 .contactName {
   font-size: 22px;
   font-weight: bold;
   line-height: 100%;
-  padding: 10px 0;
+  padding-bottom: 10px;
+}
+
+.btnWrapper {
+  display: flex;
+  gap: 10px;
 }
 
 .btn,
@@ -42,12 +67,6 @@
   position: relative;
   z-index: 0;
   cursor: pointer;
-}
-
-.btnWrapper {
-  display: flex;
-  gap: 10px;
-  padding-top: 10px;
 }
 
 .btn:disabled,

@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { changeModalStatus, changeModalAcceptBtnStatus } from '../../store/contactsSlice';
 
 import styles from './Modal.module.css';
 
-function Modal2({
+function Modal({
+  isModalActive,
+  modalKey,
   modalTitle,
   acceptBtnHandler,
   acceptBtnTitle,
@@ -14,19 +16,19 @@ function Modal2({
   children,
   componentUnmountFunc,
 }) {
-  const { isModalOpen, isModalAcceptBtnDissabled } = useSelector((state) => state.contacts);
+  const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
+  const isModalAcceptBtnDissabled = useSelector((state) => state.contacts.isModalAcceptBtnDissabled);
   const reduxDispatch = useDispatch();
 
   useEffect(()=> {
-    if (!isModalOpen.modal2) return;
+    if (!isModalActive) return;
     document.body.style.overflow = 'hidden';
     return () => {
       if (componentUnmountFunc) componentUnmountFunc();
-      if (Object.values(isModalOpen).filter(el => el === true).length < 2) document.body.style.overflow = 'auto';
     };
-  }, [isModalOpen, componentUnmountFunc, reduxDispatch]);
+  }, [isModalActive, componentUnmountFunc, isModalOpen, reduxDispatch]);
 
-  return isModalOpen.modal2 ?
+  return isModalActive ?
     (
       <div className={styles.modalWrapper}>
         <div className={styles.modal}>
@@ -35,8 +37,8 @@ function Modal2({
             <button
               className={styles.btnClose}
               onClick = {() => {
-                reduxDispatch(changeModalStatus({ key: 'modal2', confirmModalStatus: false }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+                reduxDispatch(changeModalStatus({ key: modalKey, modalStatus: false }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: modalKey, acceptBtnStatus: true }));
               }}
             >
               <span className={styles.closeSymb}>&times;</span>
@@ -49,7 +51,7 @@ function Modal2({
           <div className={styles.modalFooter}>
             <button
               className={styles.btn}
-              disabled={isModalAcceptBtnDissabled.modal2}
+              disabled={isModalAcceptBtnDissabled[modalKey]}
               onClick = {acceptBtnHandler}
             >
               {acceptBtnTitle}
@@ -65,8 +67,8 @@ function Modal2({
         <div
           className={styles.modalLayout}
           onClick = {() => {
-            reduxDispatch(changeModalStatus({ key: 'modal2', confirmModalStatus: false }));
-            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+            reduxDispatch(changeModalStatus({ key: modalKey , modalStatus: false }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: modalKey, acceptBtnStatus: true }));
           }}
         >
         </div>
@@ -74,4 +76,4 @@ function Modal2({
     ) : null;
 }
 
-export default Modal2;
+export default Modal;

@@ -25,7 +25,7 @@ import {
   launchSnackbar,
 } from '../../store/contactsSlice';
 
-import { Modal1, Modal2, Modal3, Modal4, Modal5 } from '../../components';
+import { Modal, ScrollTop } from '../../components';
 
 import styles from './ContactInfoScreen.module.css';
 
@@ -56,6 +56,7 @@ const getFieldType = (fieldTitle) => {
 
 const ContactInfoScreen = ({ history }) => {
   const reduxDispatch = useDispatch();
+  const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const currentContact = useSelector((state) => state.contacts.currentContact);
   const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
   const currentFieldKey = useSelector((state) => state.contacts.currentFieldKey);
@@ -77,108 +78,134 @@ const ContactInfoScreen = ({ history }) => {
     if (currentContactHistory.next.length) reduxDispatch(changeRedoBtnStatus({ redoBtnStatus: false }));
   }, [reduxDispatch, currentContactHistory]);
 
+  useEffect(() => {
+    if (Object.keys(currentContact).length > 2) return;
+    if (!Object.keys(currentContact).filter(key => key !== 'selected' && key !== 'id').length) {
+      if(!isSaveBtnDissabled) reduxDispatch(changeSaveBtnStatus({ saveBtnStatus: true }));
+      reduxDispatch(launchSnackbar({
+        message: 'Contact details cannot be empty. Add at least one field to save changes.',
+        options: {
+          duration: 10000,
+          position: 'left',
+          manualClose: true,
+        },
+      }));
+    }
+  }, [currentContact, isSaveBtnDissabled, reduxDispatch]);
+
   return (
-    <div className={styles.controlsWrapper}>
-      <button
-        className={styles.btn}
-        onClick = {(e) => {
-          if (!isSaveBtnDissabled) {
-            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', acceptBtnStatus: false }));
-            reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: true }));
-          } else {
+    <div className={styles.wrapper}>
+      <ScrollTop />
+      <div className={styles.controlsWrapper}>
+        <button
+          className={styles.btn}
+          onClick = {(e) => {
+            if (!isSaveBtnDissabled) {
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', acceptBtnStatus: false }));
+              reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: true }));
+              return;
+            }
+            if (!Object.keys(currentContact).filter(key => key !== 'selected' && key !== 'id').length) {
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal6', acceptBtnStatus: false }));
+              reduxDispatch(changeModalStatus({ key: 'modal6', modalStatus: true }));
+              return;
+            }
             history.push('/');
             reduxDispatch(resetCurrentContactStateHistory());
-          }
-        }}
-      >
-        Back to contacts list
-      </button>
-      <h1 className={styles.title}>Contact {currentContact.name} {currentContact.surname} details</h1>
-      <div >
-        {Object.entries(currentContact).map(contact => {
-          if (contact[0] === 'selected' || contact[0] === 'id') return null;
-          return (
-            <label
-              className={styles.label}
-              key = {contact[0]}
-            >
-              {contact[0]}:
-              <div className={styles.addInputsWrapper}>
-                <input
-                  className={styles.contactInfoInput}
-                  type='text'
-                  placeholder={contact[0]}
-                  name={contact[0]}
-                  value={currentContact[contact[0]]}
-                  readOnly
-                  onChange = {(e) => console.log('ch')}
-                />
-                <div className={styles.btnWrapper}>
-                  <button
-                    className={styles.btn}
-                    onClick = {() => {
-                      reduxDispatch(setCurrentFieldKey({ currentFieldKey: contact[0] }));
-                      reduxDispatch(addFieldTitle({ additionalFormFieldTitle: contact[0] }));
-                      reduxDispatch(addFieldValue({ additionalFormFieldValue: contact[1] }));
-                      if (getFieldType(contact[0]) === 'email') reduxDispatch(changeEmailValid(emailValidator(contact[1], 'modal3', contact[0])));
-                      if (getFieldType(contact[0]) === 'phone') reduxDispatch(changePhoneValid(phoneValidator(contact[1], 'modal3', contact[0])));
-                      if (getFieldType(contact[0]) === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: false }));
-                      reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: true }));
-                    }}
-                  >
-                Edit
-                  </button>
-                  <button
-                    className={styles.btnDanger}
-                    onClick = {(e) => {
-                      reduxDispatch(setCurrentFieldKey({ currentFieldKey: contact[0] }));
-                      reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: false }));
-                      reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: true }));
-                    }}
-                  >
-                Delete
-                  </button>
-                </div>
-              </div>
-            </label>
-          );
-        })}
-      </div>
-      <button
-        className={styles.btn}
-        onClick = {() => reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: true }))}
-      >
-        Add field
-      </button>
-      <div className={styles.hrLine}><hr /></div>
-      <div className={styles.btnWrapper}>
-        <button
-          className={styles.btn}
-          disabled={isSaveBtnDissabled}
-          onClick = {() => {
-            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: false }));
-            reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: true }));
+
           }}
         >
+        Back to contacts list
+        </button>
+        <h1 className={styles.title}>Contact {currentContact.name} {currentContact.surname} details</h1>
+        <div >
+          {Object.entries(currentContact).map(contact => {
+            if (contact[0] === 'selected' || contact[0] === 'id') return null;
+            return (
+              <label
+                className={styles.label}
+                key = {contact[0]}
+              >
+                {contact[0]}:
+                <div className={styles.addInputsWrapper}>
+                  <input
+                    className={styles.contactInfoInput}
+                    type='text'
+                    placeholder={contact[0]}
+                    name={contact[0]}
+                    value={currentContact[contact[0]]}
+                    readOnly
+                    onChange = {(e) => console.log('ch')}
+                  />
+                  <div className={styles.btnWrapper}>
+                    <button
+                      className={styles.btn}
+                      onClick = {() => {
+                        reduxDispatch(setCurrentFieldKey({ currentFieldKey: contact[0] }));
+                        reduxDispatch(addFieldTitle({ additionalFormFieldTitle: contact[0] }));
+                        reduxDispatch(addFieldValue({ additionalFormFieldValue: contact[1] }));
+                        if (getFieldType(contact[0]) === 'email') reduxDispatch(changeEmailValid(emailValidator(contact[1], 'modal3', contact[0])));
+                        if (getFieldType(contact[0]) === 'phone') reduxDispatch(changePhoneValid(phoneValidator(contact[1], 'modal3', contact[0])));
+                        if (getFieldType(contact[0]) === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: false }));
+                        reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: true }));
+                      }}
+                    >
+                Edit
+                    </button>
+                    <button
+                      className={styles.btnDanger}
+                      onClick = {(e) => {
+                        reduxDispatch(setCurrentFieldKey({ currentFieldKey: contact[0] }));
+                        reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: false }));
+                        reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: true }));
+                      }}
+                    >
+                Delete
+                    </button>
+                  </div>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+        <button
+          className={styles.btn}
+          onClick = {() => reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: true }))}
+        >
+        Add field
+        </button>
+        <div className={styles.hrLine}><hr /></div>
+        <div className={styles.btnWrapper}>
+          <button
+            className={styles.btn}
+            disabled={isSaveBtnDissabled}
+            onClick = {() => {
+              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: false }));
+              reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: true }));
+            }}
+          >
           Save changes
-        </button>
-        <button
-          className={styles.btn}
-          disabled={isUndoBtnDissabled}
-          onClick = {() => reduxDispatch(undoCurrentContactStateHistory())}
-        >
+          </button>
+          <button
+            className={styles.btn}
+            disabled={isUndoBtnDissabled}
+            onClick = {() => reduxDispatch(undoCurrentContactStateHistory())}
+          >
           Undo
-        </button>
-        <button
-          className={styles.btn}
-          disabled={isRedoBtnDissabled}
-          onClick = {() => reduxDispatch(redoCurrentContactStateHistory())}
-        >
+          </button>
+          <button
+            className={styles.btn}
+            disabled={isRedoBtnDissabled}
+            onClick = {() => reduxDispatch(redoCurrentContactStateHistory())}
+          >
           Redo
-        </button>
+          </button>
+        </div>
       </div>
 
-      <Modal1
+      <Modal
+        isModalActive = {isModalOpen.modal1}
+        modalKey = {'modal1'}
         modalTitle = {'Add new field'}
         acceptBtnHandler = {() => {
           reduxDispatch(addFieldToCurrentContact({ fieldTitle: fieldTitle, fieldValue: fieldValue }));
@@ -210,7 +237,7 @@ const ContactInfoScreen = ({ history }) => {
             data-is-empty={fieldTitle ? 'false' : 'true'}
             onChange = {(e) => {
               reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              if (Object.keys(currentContact).includes(e.target.value)) {
+              if (Object.keys(currentContact).map(key => key.toLowerCase()).includes(e.target.value.toLowerCase())) {
                 reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
                 reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
               } else {
@@ -236,15 +263,17 @@ const ContactInfoScreen = ({ history }) => {
             data-is-empty={getFieldType(fieldTitle) === 'email' || getFieldType(fieldTitle) === 'phone' ? fieldValue ? 'false' : 'true' : ''}
             onChange = {(e) => {
               reduxDispatch(addFieldValue({ additionalFormFieldValue: e.target.value }));
-              if (getFieldType(fieldTitle) === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: (e.target.value && fieldTitle) || fieldTitle ? false : true }));
+              if (getFieldType(fieldTitle) === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
               if (getFieldType(fieldTitle) === 'email') reduxDispatch(changeEmailValid(emailValidator(e.target.value, 'modal1', fieldTitle)));
               if (getFieldType(fieldTitle) === 'phone') reduxDispatch(changePhoneValid(phoneValidator(e.target.value, 'modal1', fieldTitle)));
             }}
           />
         </label>
-      </Modal1>
+      </Modal>
 
-      <Modal2
+      <Modal
+        isModalActive = {isModalOpen.modal2}
+        modalKey = {'modal2'}
         modalTitle = {'Delete field'}
         acceptBtnHandler = {() => {
           reduxDispatch(deleteFieldFromCurrentContact({ key: currentFieldKey }));
@@ -259,9 +288,11 @@ const ContactInfoScreen = ({ history }) => {
         rejectBtnTitle = {'No'}
       >
         <h3>Delete field: {currentFieldKey} ?</h3>
-      </Modal2>
+      </Modal>
 
-      <Modal3
+      <Modal
+        isModalActive = {isModalOpen.modal3}
+        modalKey = {'modal3'}
         modalTitle = {'Edit field'}
         acceptBtnHandler = {() => {
           reduxDispatch(editCurrentContactField({ fieldCurrentTitle: currentFieldKey, fieldNewTitle: fieldTitle, fieldValue: fieldValue }));
@@ -279,6 +310,8 @@ const ContactInfoScreen = ({ history }) => {
       >
         <label
           className={styles.label}
+          data-is-uniq={!isFieldExist}
+          data-is-empty={fieldTitle ? 'false' : 'true'}
         >
           Field title:
           <input
@@ -287,9 +320,17 @@ const ContactInfoScreen = ({ history }) => {
             placeholder='Field title'
             name='fieldTitle'
             value={fieldTitle}
+            data-is-uniq={!isFieldExist}
+            data-is-empty={fieldTitle ? 'false' : 'true'}
             onChange = {(e) => {
               reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: e.target.value ? false : true }));
+              if (Object.keys(currentContact).map(key => key.toLowerCase()).includes(e.target.value.toLowerCase())) {
+                reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
+              } else {
+                if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: e.target.value ? false : true }));
+              }
             }}
           />
         </label>
@@ -309,15 +350,17 @@ const ContactInfoScreen = ({ history }) => {
             data-is-empty={getFieldType(fieldTitle) === 'email' || getFieldType(fieldTitle) === 'phone' ? fieldValue ? 'false' : 'true' : ''}
             onChange = {(e) => {
               reduxDispatch(addFieldValue({ additionalFormFieldValue: e.target.value }));
-              if (getFieldType(fieldTitle) === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: (e.target.value && fieldTitle) || fieldTitle ? false : true }));
+              if (getFieldType(fieldTitle) === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
               if (getFieldType(fieldTitle) === 'email') reduxDispatch(changeEmailValid(emailValidator(e.target.value, 'modal3', fieldTitle)));
               if (getFieldType(fieldTitle) === 'phone') reduxDispatch(changePhoneValid(phoneValidator(e.target.value, 'modal3', fieldTitle)));
             }}
           />
         </label>
-      </Modal3>
+      </Modal>
 
-      <Modal4
+      <Modal
+        isModalActive = {isModalOpen.modal4}
+        modalKey = {'modal4'}
         modalTitle = {'Update contact'}
         acceptBtnHandler = {() => {
           reduxDispatch(updateContact());
@@ -341,9 +384,11 @@ const ContactInfoScreen = ({ history }) => {
         rejectBtnTitle = {'No'}
       >
         <h3>Update contact: {currentContact.name} {currentContact.surname} ?</h3>
-      </Modal4>
+      </Modal>
 
-      <Modal5
+      <Modal
+        isModalActive = {isModalOpen.modal5}
+        modalKey = {'modal5'}
         modalTitle = {'Save changes'}
         acceptBtnHandler = {() => {
           reduxDispatch(updateContact());
@@ -351,7 +396,7 @@ const ContactInfoScreen = ({ history }) => {
           reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', acceptBtnStatus: true }));
           reduxDispatch(launchSnackbar({
-            message: `Contact ${currentContact.name} ${currentContact.surname} changes been saved`,
+            message: `Contact ${currentContact.name} ${currentContact.surname} details changes been saved`,
             options: {
               duration: 8000,
               position: 'top',
@@ -369,8 +414,36 @@ const ContactInfoScreen = ({ history }) => {
         }}
         rejectBtnTitle = {'No'}
       >
-        <h3>Save contact {currentContact.name} {currentContact.surname} changes before leaving the page ?</h3>
-      </Modal5>
+        <h3>Save contact {currentContact.name} {currentContact.surname} details changes before closing contact details ?</h3>
+      </Modal>
+
+      <Modal
+        isModalActive = {isModalOpen.modal6}
+        modalKey = {'modal6'}
+        modalTitle = {'Discard changes'}
+        acceptBtnHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal6', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal6', acceptBtnStatus: true }));
+        }}
+        acceptBtnTitle = {'No'}
+        rejectBtnHandler = {() => {
+          reduxDispatch(resetCurrentContactStateHistory());
+          reduxDispatch(changeModalStatus({ key: 'modal6', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal6', acceptBtnStatus: true }));
+          reduxDispatch(launchSnackbar({
+            message: 'All contact details changes been discarded',
+            options: {
+              duration: 8000,
+              position: 'top',
+              manualClose: true,
+            },
+          }));
+          history.push('/');
+        }}
+        rejectBtnTitle = {'Yes'}
+      >
+        <h3>Discard all contact details changes? To continue edit contact details press `No` or close modal window (to save changes add at least one field).</h3>
+      </Modal>
 
     </div>
   );

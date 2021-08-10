@@ -33,6 +33,7 @@ const contactsSlice = createSlice({
       modal3: false,
       modal4: false,
       modal5: false,
+      modal6: false,
     },
     isModalAcceptBtnDissabled: {
       modal1: true,
@@ -40,6 +41,7 @@ const contactsSlice = createSlice({
       modal3: true,
       modal4: true,
       modal5: true,
+      modal6: true,
     },
     isSaveBtnDissabled: true,
     isUndoBtnDissabled: true,
@@ -83,6 +85,7 @@ const contactsSlice = createSlice({
       positions: ['top', 'bottom', 'left', 'right'],
       isActive: false,
     },
+    scrollBarWidth: null,
   },
 
   reducers: {
@@ -305,6 +308,10 @@ const contactsSlice = createSlice({
     setSnackbarHeight(state, action) {
       state.snackbar.height = action.payload.height;
     },
+
+    setScrollBarWidth(state, action) {
+      state.scrollBarWidth = action.payload.scrollBarWidth;
+    },
   },
 
 });
@@ -350,6 +357,7 @@ export const {
   closeSnackbar,
   setSnackbarWidth,
   setSnackbarHeight,
+  setScrollBarWidth,
 } = contactsSlice.actions;
 
 export default contactsSlice.reducer;
