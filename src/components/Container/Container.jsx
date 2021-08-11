@@ -4,27 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setScrollBarWidth } from '../../store/contactsSlice';
 
 import { Snackbar } from '../../components';
+import { getScrollBarWidth } from '../../utils/utils';
 
 import styles from './Container.module.css';
 
 function localStorageSet(value = [], key = 'contacts') {
   localStorage[key] = JSON.stringify(value);
-}
-
-function getscrollbarWidth() {
-  const outer = document.createElement('div');
-
-  outer.style.position = 'adsolute';
-  outer.style.top = '-9999px';
-  outer.style.width = '50px';
-  outer.style.height = '50px';
-  outer.style.overflow = 'scroll';
-  outer.style.visibility = 'hidden';
-  document.body.appendChild(outer);
-  const scrollbarWidth = outer.offsetWidth - outer.clientWidth;
-  document.body.removeChild(outer);
-
-  return scrollbarWidth;
 }
 
 const Container = ({ children }) => {
@@ -38,7 +23,7 @@ const Container = ({ children }) => {
   }, [contactsList]);
 
   useEffect(() => {
-    reduxDispatch(setScrollBarWidth({ scrollBarWidth: `${getscrollbarWidth()}px` }));
+    reduxDispatch(setScrollBarWidth({ scrollBarWidth: `${getScrollBarWidth()}px` }));
   }, [reduxDispatch]);
 
   useEffect(() => {
@@ -46,11 +31,17 @@ const Container = ({ children }) => {
       document.body.style.overflow = 'hidden';
       if (document.body.offsetHeight > document.documentElement.clientHeight) {
         document.getElementById('container').style.paddingRight = scrollBarWidth;
+        document.getElementById('header').style.paddingRight = scrollBarWidth;
+        document.getElementById('footer').style.paddingRight = scrollBarWidth;
+        document.getElementById('scrollTopBtn').style.marginRight = scrollBarWidth;
       }
     } else {
       document.body.style.overflow = 'auto';
       if (document.body.offsetHeight > document.documentElement.clientHeight) {
         document.getElementById('container').style.paddingRight = '';
+        document.getElementById('header').style.paddingRight = '';
+        document.getElementById('footer').style.paddingRight = '';
+        document.getElementById('scrollTopBtn').style.marginRight = '';
       }
     }
   }, [isModalOpen, scrollBarWidth]);

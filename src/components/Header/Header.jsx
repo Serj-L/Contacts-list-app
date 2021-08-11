@@ -2,8 +2,10 @@ import styles from './Header.module.css';
 
 function Header() {
   return (
-    <header>
-      <h1 className={styles.title}>Contacts List</h1>
+    <header id='header'>
+      <div className={styles.wrapper}>
+        <h1 className={styles.title}>Contacts List</h1>
+      </div>
     </header>
   );
 }

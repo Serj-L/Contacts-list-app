@@ -25,18 +25,20 @@ const ScrollTop = () => {
     });
   };
 
-  return (<div
-    className={styles.scrollTop}
-    style={!isScrollingDown ? { display: 'none' } : {}}
-    id='scrollTop'
-  >
-    <button
-      className={styles.scrollTopBtn}
-      onClick = {onClickHandle}
+  return (
+    <div
+      className={styles.scrollTop}
+      style={!isScrollingDown ? { visibility: 'hidden' } : { visibility: 'visible' }}
+      id='scrollTop'
     >
-      <IconShevronUp color='#ffffff'/>
-    </button>
-  </div>
+      <button
+        className={styles.scrollTopBtn}
+        id='scrollTopBtn'
+        onClick = {onClickHandle}
+      >
+        <IconShevronUp color='#ffffff'/>
+      </button>
+    </div>
   );
 };
 

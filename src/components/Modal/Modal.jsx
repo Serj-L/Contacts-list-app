@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { changeModalStatus, changeModalAcceptBtnStatus } from '../../store/contactsSlice';
-
 import styles from './Modal.module.css';
 
 function Modal({
@@ -13,8 +11,9 @@ function Modal({
   acceptBtnTitle,
   rejectBtnHandler,
   rejectBtnTitle,
-  children,
+  closeModalHandler,
   componentUnmountFunc,
+  children,
 }) {
   const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const isModalAcceptBtnDissabled = useSelector((state) => state.contacts.isModalAcceptBtnDissabled);
@@ -36,10 +35,7 @@ function Modal({
             <h2 className={styles.modalTitle}>{modalTitle}</h2>
             <button
               className={styles.btnClose}
-              onClick = {() => {
-                reduxDispatch(changeModalStatus({ key: modalKey, modalStatus: false }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: modalKey, acceptBtnStatus: true }));
-              }}
+              onClick = {closeModalHandler}
             >
               <span className={styles.closeSymb}>&times;</span>
             </button>
@@ -66,10 +62,7 @@ function Modal({
         </div>
         <div
           className={styles.modalLayout}
-          onClick = {() => {
-            reduxDispatch(changeModalStatus({ key: modalKey , modalStatus: false }));
-            reduxDispatch(changeModalAcceptBtnStatus({ key: modalKey, acceptBtnStatus: true }));
-          }}
+          onClick = {closeModalHandler}
         >
         </div>
       </div>

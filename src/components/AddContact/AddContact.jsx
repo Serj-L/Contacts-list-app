@@ -43,12 +43,50 @@ function AddContact() {
         }}
         acceptBtnTitle = {'Add contact'}
         rejectBtnHandler = {() => {
+          if (Object.values(contact).filter(el => el !== '').length) {
+            reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: true }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: false }));
+          } else {
+            reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
+          }
+        }}
+        rejectBtnTitle = {'Cancel'}
+        closeModalHandler = {() => {
+          if (Object.values(contact).filter(el => el !== '').length) {
+            reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: true }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: false }));
+          } else {
+            reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
+            reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
+          }
+        }}
+      >
+        <Form />
+      </Modal>
+
+      <Modal
+        isModalActive = {isModalOpen.modal2}
+        modalKey = {'modal2'}
+        modalTitle = {'Discard changes'}
+        acceptBtnHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+        }}
+        acceptBtnTitle = {'No'}
+        rejectBtnHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
           reduxDispatch(changeModalStatus({ key: 'modal1', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
         }}
-        rejectBtnTitle = {'Cancel'}
+        rejectBtnTitle = {'Yes'}
+        closeModalHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+        }}
       >
-        <Form />
+        <h3>Discard changes ? To continue edit press `No` or close modal window.</h3>
       </Modal>
 
     </div>

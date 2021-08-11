@@ -21,7 +21,7 @@
   text-align: center;
 }
 
-.listWrapper {
+.contactInfoWrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,7 +30,7 @@
   padding: 10px 0;
 }
 
-.listWrapper:not(:last-child) {
+.contactsList .contactInfoWrapper:not(:last-of-type) {
   border-bottom: 2px solid #a7a7a7;
 }
 

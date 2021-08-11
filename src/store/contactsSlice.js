@@ -56,10 +56,10 @@ const contactsSlice = createSlice({
       phone: false,
       email: false,
     },
-    additionalFormFields: [],
-    additionalFormFieldTitle: '',
-    additionalFormFieldValue: '',
-    currentAdditionalField: {},
+    additionalFields: [],
+    additionalFieldTitle: '',
+    additionalFieldValue: '',
+    additionalFieldType: '',
     currentFieldKey: '',
     isFieldExist: false,
     contactsList,
@@ -136,39 +136,35 @@ const contactsSlice = createSlice({
     },
 
     addFieldTitle(state, action) {
-      state.additionalFormFieldTitle = action.payload.additionalFormFieldTitle;
+      state.additionalFieldTitle = action.payload.additionalFieldTitle;
     },
 
     addFieldValue(state, action) {
-      state.additionalFormFieldValue = action.payload.additionalFormFieldValue;
+      state.additionalFieldValue = action.payload.additionalFieldValue;
+    },
+
+    setAddFieldType(state, action) {
+      state.additionalFieldType = action.payload.additionalFieldType;
     },
 
     clrAddFieldValues(state) {
-      state.additionalFormFieldTitle = '';
-      state.additionalFormFieldValue = '';
+      state.additionalFieldTitle = '';
+      state.additionalFieldValue = '';
+    },
+
+    setCurrentFieldKey(state, action) {
+      state.currentFieldKey = action.payload.currentFieldKey;
     },
 
     addFieldToForm(state, action) {
-      if (!state.additionalFormFields.filter(el => el.key === action.payload.fieldTitle).length) {
-        state.additionalFormFields.push({
-          id: uuid(),
-          key: action.payload.fieldTitle,
-        });
+      if (!state.additionalFields.filter(el => el === action.payload.fieldTitle).length) {
+        state.additionalFields.push(action.payload.fieldTitle);
         state.addContactInfo[action.payload.fieldTitle] = action.payload.fieldValue;
       }
     },
 
     addFieldToCurrentContact(state, action) {
       state.currentContact[action.payload.fieldTitle] = action.payload.fieldValue;
-    },
-
-    setCurrentAddField(state, action) {
-      state.currentAdditionalField.id = action.payload.additionalFormFieldId;
-      state.currentAdditionalField.key = action.payload.additionalFormFieldKey;
-    },
-
-    setCurrentFieldKey(state, action) {
-      state.currentFieldKey = action.payload.currentFieldKey;
     },
 
     editCurrentContactField(state, action) {
@@ -190,7 +186,7 @@ const contactsSlice = createSlice({
     },
 
     deleteFieldFromForm(state, action) {
-      state.additionalFormFields = state.additionalFormFields.filter(el => el.id !== action.payload.fieldId);
+      state.additionalFields = state.additionalFields.filter(el => el !== action.payload.key);
       delete state.addContactInfo[action.payload.key];
     },
 
@@ -330,10 +326,10 @@ export const {
   changeFieldExistStatus,
   addFieldTitle,
   addFieldValue,
+  setAddFieldType,
   clrAddFieldValues,
   addFieldToForm,
   addFieldToCurrentContact,
-  setCurrentAddField,
   setCurrentFieldKey,
   editCurrentContactField,
   deleteFieldFromForm,

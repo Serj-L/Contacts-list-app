@@ -13,35 +13,23 @@ import {
   changeFieldExistStatus,
   addFieldTitle,
   addFieldValue,
+  setAddFieldType,
   clrAddFieldValues,
   addFieldToForm,
   deleteFieldFromForm,
-  setCurrentAddField,
+  setCurrentFieldKey,
 } from '../../store/contactsSlice';
 
+import {
+  formValidator,
+  emailValidator,
+  phoneValidator,
+  addFieldEmailValidator,
+  addFieldPhoneValidator,
+  getFieldType,
+} from '../../utils/utils';
+
 import styles from './Form.module.css';
-
-const formValidator = (name, email, phone, isEmailValid, isPhoneValid) => {
-  return (name && (!email && !phone)) || (isEmailValid && !phone) || (isPhoneValid && !email) || (isEmailValid && isPhoneValid) ? false : true;
-};
-
-const emailValidator = (email, phone, isPhoneValid, name, surname, key) => {
-  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase());
-  return {
-    email: isValid,
-    key,
-    acceptBtnStatus: (isValid && !phone) || (isPhoneValid && !email) || (isValid && isPhoneValid) || ((!email && !phone) && (name || surname)) ? false : true,
-  };
-};
-
-const phoneValidator = (phone, email, isEmailValid, name, surname, key) => {
-  const isValid = /(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?/.test(phone.trim());
-  return {
-    phone: isValid,
-    key,
-    acceptBtnStatus: (isValid && !email) || (isEmailValid && !phone) || (isValid && isEmailValid) || ((!phone && !email) && (name || surname)) ? false : true,
-  };
-};
 
 function Form() {
   const reduxDispatch = useDispatch();
@@ -49,16 +37,21 @@ function Form() {
   const contact = useSelector((state) => state.contacts.addContactInfo);
   const { phone: isPhoneValid, email: isEmailValid } = useSelector((state) => state.contacts.isInputsValid);
   const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
-  const fieldTitle = useSelector((state) => state.contacts.additionalFormFieldTitle);
-  const fieldValue = useSelector((state) => state.contacts.additionalFormFieldValue);
-  const currentAddfield = useSelector((state) => state.contacts.currentAdditionalField);
-  const additionalFields = useSelector((state) => state.contacts.additionalFormFields);
+  const fieldTitle = useSelector((state) => state.contacts.additionalFieldTitle);
+  const fieldValue = useSelector((state) => state.contacts.additionalFieldValue);
+  const fieldType = useSelector((state) => state.contacts.additionalFieldType);
+  const currentFieldKey = useSelector((state) => state.contacts.currentFieldKey);
+  const additionalFields = useSelector((state) => state.contacts.additionalFields);
 
   useEffect(() => {
     return () => {
       reduxDispatch(clearContactInfo());
     };
   }, [reduxDispatch]);
+
+  useEffect(() => {
+    reduxDispatch(setAddFieldType({ additionalFieldType: getFieldType(fieldTitle) }));
+  }, [reduxDispatch, fieldTitle]);
 
   const clearAddFieldValues = useCallback(() => reduxDispatch(clrAddFieldValues()), [reduxDispatch]);
 
@@ -142,28 +135,28 @@ function Form() {
             return (
               <label
                 className={styles.label}
-                key = {additionalField.id}
+                key = {additionalField}
               >
-                {additionalField.key}:
+                {additionalField}:
                 <div className={styles.addInputsWrapper}>
                   <input
                     className={styles.input}
                     type='text'
-                    placeholder={additionalField.key}
-                    name={additionalField.key}
-                    value={contact[additionalField.key]}
+                    placeholder={additionalField}
+                    name={additionalField}
+                    value={contact[additionalField]}
                     onChange = {(e) =>{
                       e.preventDefault();
-                      reduxDispatch(addContactInfo({ name: additionalField.key, value: e.target.value }));
+                      reduxDispatch(addContactInfo({ name: additionalField, value: e.target.value }));
                     }}
                   />
                   <button
                     className={styles.btnClose}
                     onClick = {(e) => {
                       e.preventDefault();
-                      reduxDispatch(setCurrentAddField({ additionalFormFieldId: additionalField.id, additionalFormFieldKey: additionalField.key }));
-                      reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: false }));
-                      reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: true }));
+                      reduxDispatch(setCurrentFieldKey({ currentFieldKey: additionalField }));
+                      reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: false }));
+                      reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: true }));
                     }}
                   >
                     <span className={styles.closeSymb}>&times;</span>
@@ -176,26 +169,29 @@ function Form() {
       </form>
       <button
         className={styles.btn}
-        onClick = {() => reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: true }))}
+        onClick = {() => reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: true }))}
       >
         Add field
       </button>
-
-      <Modal
-        isModalActive = {isModalOpen.modal2}
-        modalKey = {'modal2'}
+      {<Modal
+        isModalActive = {isModalOpen.modal3}
+        modalKey = {'modal3'}
         modalTitle = {'Add new field'}
         acceptBtnHandler = {() => {
           reduxDispatch(addFieldToForm({ fieldTitle: fieldTitle, fieldValue: fieldValue }));
-          reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
-          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+          reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
         acceptBtnTitle = {'Add field'}
         rejectBtnHandler = {() => {
-          reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
-          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
+          reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
         rejectBtnTitle = {'Cancel'}
+        closeModalHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
+        }}
         componentUnmountFunc = {clearAddFieldValues}
       >
         <label
@@ -213,19 +209,27 @@ function Form() {
             data-is-uniq={!isFieldExist}
             data-is-empty={fieldTitle ? 'false' : 'true'}
             onChange = {(e) => {
-              reduxDispatch(addFieldTitle({ additionalFormFieldTitle: e.target.value }));
-              if (Object.keys(contact).map(key => key.toLowerCase()).includes(e.target.value.toLowerCase())) {
+              reduxDispatch(addFieldTitle({ additionalFieldTitle: e.target.value }));
+              if (Object.keys(contact).map(key => key.toLowerCase().trim()).includes(e.target.value.toLowerCase().trim())) {
                 reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
-              } else {
-                if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: e.target.value ? false : true }));
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
+                return;
               }
+              if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
+              if (fieldType === 'other' || !fieldValue) {
+                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: e.target.value ? false : true }));
+                return;
+              }
+              fieldType === 'email' ?
+                reduxDispatch(changeEmailValid(addFieldEmailValidator(fieldValue, 'modal3', fieldTitle, isFieldExist))) :
+                reduxDispatch(changePhoneValid(addFieldPhoneValidator(fieldValue, 'modal3', fieldTitle, isFieldExist)));
             }}
           />
         </label>
         <label
           className={styles.label}
+          data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
+          data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
         >
           Field value:
           <input
@@ -234,30 +238,38 @@ function Form() {
             placeholder='Field value'
             name='fieldValue'
             value={fieldValue}
+            data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
+            data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
             onChange = {(e) => {
-              reduxDispatch(addFieldValue({ additionalFormFieldValue: e.target.value }));
-              reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
+              reduxDispatch(addFieldValue({ additionalFieldValue: e.target.value }));
+              if (fieldType === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
+              if (fieldType === 'email') reduxDispatch(changeEmailValid(addFieldEmailValidator(e.target.value, 'modal3', fieldTitle, isFieldExist)));
+              if (fieldType === 'phone') reduxDispatch(changePhoneValid(addFieldPhoneValidator(e.target.value, 'modal3', fieldTitle, isFieldExist)));
             }}
           />
         </label>
-      </Modal>
+      </Modal>}
 
       <Modal
-        isModalActive = {isModalOpen.modal3}
-        modalKey = {'modal3'}
+        isModalActive = {isModalOpen.modal4}
+        modalKey = {'modal4'}
         modalTitle = {'Delete field'}
         acceptBtnHandler = {() => {
-          reduxDispatch(deleteFieldFromForm({ fieldId: currentAddfield.id, key: currentAddfield.key }));
-          reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
-          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
+          reduxDispatch(deleteFieldFromForm({ key: currentFieldKey }));
+          reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: true }));
         }}
         acceptBtnTitle = {'Yes'}
         rejectBtnHandler = {() => {
-          reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
-          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));}}
+          reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: true }));}}
         rejectBtnTitle = {'No'}
+        closeModalHandler = {() => {
+          reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: false }));
+          reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: true }));
+        }}
       >
-        <h3>Delete field: {currentAddfield.key} ?</h3>
+        <h3>Delete field: {currentFieldKey} ?</h3>
       </Modal>
 
     </div>
