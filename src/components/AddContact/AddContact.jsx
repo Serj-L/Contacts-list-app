@@ -48,10 +48,7 @@ function AddContact() {
         }}
         rejectBtnTitle = {'Cancel'}
       >
-        <div>
-          <Form />
-        </div>
-
+        <Form />
       </Modal>
 
     </div>

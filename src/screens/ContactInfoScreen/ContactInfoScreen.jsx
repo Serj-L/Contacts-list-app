@@ -57,6 +57,7 @@ const getFieldType = (fieldTitle) => {
 const ContactInfoScreen = ({ history }) => {
   const reduxDispatch = useDispatch();
   const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
+  const contactsList = useSelector((state) => state.contacts.contactsList);
   const currentContact = useSelector((state) => state.contacts.currentContact);
   const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
   const currentFieldKey = useSelector((state) => state.contacts.currentFieldKey);
@@ -69,6 +70,8 @@ const ContactInfoScreen = ({ history }) => {
   const currentContactHistory = useSelector((state) => state.contacts.currentContactHistory);
 
   const clearAddFieldValues = useCallback(() => reduxDispatch(clrAddFieldValues()), [reduxDispatch]);
+
+  const contactFromList = contactsList.filter(contact => contact.id === currentContact.id)[0];
 
   useEffect(() => {
     if (currentContactHistory.prev.length) {
@@ -95,7 +98,9 @@ const ContactInfoScreen = ({ history }) => {
 
   return (
     <div className={styles.wrapper}>
+
       <ScrollTop />
+
       <div className={styles.controlsWrapper}>
         <button
           className={styles.btn}
@@ -368,7 +373,7 @@ const ContactInfoScreen = ({ history }) => {
           reduxDispatch(changeModalStatus({ key: 'modal4', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal4', acceptBtnStatus: true }));
           reduxDispatch(launchSnackbar({
-            message: `Contact ${currentContact.name} ${currentContact.surname} been updated`,
+            message: `Contact ${currentContact.name ? currentContact.name : ''} ${currentContact.surname ? currentContact.surname : ''} been updated`,
             options: {
               duration: 8000,
               position: 'top',
@@ -383,7 +388,7 @@ const ContactInfoScreen = ({ history }) => {
         }}
         rejectBtnTitle = {'No'}
       >
-        <h3>Update contact: {currentContact.name} {currentContact.surname} ?</h3>
+        <h3>Update contact {currentContact.name} {currentContact.surname} ?</h3>
       </Modal>
 
       <Modal
@@ -396,7 +401,7 @@ const ContactInfoScreen = ({ history }) => {
           reduxDispatch(changeModalStatus({ key: 'modal5', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal5', acceptBtnStatus: true }));
           reduxDispatch(launchSnackbar({
-            message: `Contact ${currentContact.name} ${currentContact.surname} details changes been saved`,
+            message: `Contact ${currentContact.name ? currentContact.name : ''} ${currentContact.surname ? currentContact.surname : ''} details changes been saved`,
             options: {
               duration: 8000,
               position: 'top',
@@ -431,7 +436,7 @@ const ContactInfoScreen = ({ history }) => {
           reduxDispatch(changeModalStatus({ key: 'modal6', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal6', acceptBtnStatus: true }));
           reduxDispatch(launchSnackbar({
-            message: 'All contact details changes been discarded',
+            message: `All contact ${contactFromList.name ? contactFromList.name : ''} ${contactFromList.surname ? contactFromList.surname : ''} details changes been discarded`,
             options: {
               duration: 8000,
               position: 'top',

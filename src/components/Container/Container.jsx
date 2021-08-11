@@ -60,9 +60,7 @@ const Container = ({ children }) => {
       className={styles.container}
       id='container'
     >
-
       <Snackbar />
-
       {children}
     </div>
   );

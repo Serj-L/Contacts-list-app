@@ -43,7 +43,9 @@ const ContactsListScreen = ({ history }) => {
 
   return (
     <div className={styles.wrapper}>
+
       <ScrollTop />
+
       <h1 className={styles.title}>Contacts list</h1>
       <div className={styles.controlsWrapper}>
         <div className={styles.selectBtns}>
