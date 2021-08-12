@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import {
   changeModalStatus,
@@ -184,6 +185,10 @@ const ContactsListScreen = ({ history }) => {
 
     </div>
   );
+};
+
+ContactsListScreen.propTypes = {
+  history: PropTypes.object.isRequired,
 };
 
 export default ContactsListScreen;

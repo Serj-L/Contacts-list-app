@@ -1,0 +1,66 @@
+.input {
+  width: 100%;
+  font-size: 18px;
+  line-height: 100%;
+  font-weight: 400;
+  height: 50px;
+  background-color: #ffffff;
+  outline: none;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 0 15px 0;
+  margin: 10px 0;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.input::placeholder {
+  color: rgba(51, 51, 51, 0.5);
+}
+
+.input:hover,
+.input:focus {
+  border-color: #377dff;
+}
+
+.input[data-is-valid='false'][data-is-empty='false'],
+.input[data-is-uniq='false'][data-is-empty='false'],
+.input[data-is-valid='false'][data-is-empty='false']:hover
+.input[data-is-valid='false'][data-is-empty='false']:focus,
+.input[data-is-uniq='false'][data-is-empty='false']:hover
+.input[data-is-uniq='false'][data-is-empty='false']:focus {
+  border-color: #ff7637;
+}
+
+.label {
+  width: 100%;
+  font-size: 20px;
+  position: relative;
+}
+
+.label[data-is-valid='false'][data-is-empty='false']::after {
+  content: 'Please enter correct data';
+}
+
+.label[data-is-uniq='false'][data-is-empty='false']::after {
+  content: 'Field is already exist';
+}
+
+.label[data-is-valid='false'][data-is-empty='false']::after,
+.label[data-is-uniq='false'][data-is-empty='false']::after {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  position: absolute;
+  width: 80%;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: inherit;
+  color: #ffffff;
+  line-height: 100%;
+  border-radius: 4px;
+  background-color: #ff7637;
+  padding: 10px;
+}

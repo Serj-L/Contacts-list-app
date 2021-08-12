@@ -10,7 +10,7 @@ import {
 import { Modal, Form } from '../../components';
 import styles from './AddContact.module.css';
 
-function AddContact() {
+const AddContact = () => {
   const reduxDispatch = useDispatch();
   const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const contact = useSelector((state) => state.contacts.addContactInfo);
@@ -91,6 +91,6 @@ function AddContact() {
 
     </div>
   );
-}
+};
 
 export default AddContact;

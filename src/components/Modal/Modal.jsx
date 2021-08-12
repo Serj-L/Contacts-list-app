@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import styles from './Modal.module.css';
 
-function Modal({
+const Modal = ({
   isModalActive,
   modalKey,
   modalTitle,
@@ -14,7 +15,7 @@ function Modal({
   closeModalHandler,
   componentUnmountFunc,
   children,
-}) {
+}) => {
   const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const isModalAcceptBtnDissabled = useSelector((state) => state.contacts.isModalAcceptBtnDissabled);
   const reduxDispatch = useDispatch();
@@ -67,6 +68,24 @@ function Modal({
         </div>
       </div>
     ) : null;
-}
+};
+
+Modal.propTypes = {
+  isModalActive: PropTypes.bool.isRequired,
+  modalKey: PropTypes.string.isRequired,
+  modalTitle: PropTypes.string,
+  acceptBtnHandler: PropTypes.func.isRequired,
+  acceptBtnTitle: PropTypes.string,
+  rejectBtnHandler: PropTypes.func.isRequired,
+  rejectBtnTitle: PropTypes.string,
+  closeModalHandler: PropTypes.func.isRequired,
+  componentUnmountFunc: PropTypes.func,
+};
+
+Modal.defaultProps = {
+  modalTitle: 'Modal window',
+  acceptBtnTitle: 'Accept',
+  rejectBtnTitle: 'Reject',
+};
 
 export default Modal;

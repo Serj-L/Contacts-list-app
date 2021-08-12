@@ -1,14 +1,13 @@
 import { useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import {
   changeModalStatus,
   changeModalAcceptBtnStatus,
   changeSaveBtnStatus,
-  changeFieldExistStatus,
   addFieldTitle,
   addFieldValue,
-  setAddFieldType,
   setCurrentFieldKey,
   editCurrentContactField,
   deleteFieldFromCurrentContact,
@@ -26,7 +25,7 @@ import {
   launchSnackbar,
 } from '../../store/contactsSlice';
 
-import { Modal, ScrollTop } from '../../components';
+import { Modal, AddEditForm, ScrollTop } from '../../components';
 
 import styles from './ContactInfoScreen.module.css';
 
@@ -41,24 +40,17 @@ const ContactInfoScreen = ({ history }) => {
   const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const contactsList = useSelector((state) => state.contacts.contactsList);
   const currentContact = useSelector((state) => state.contacts.currentContact);
-  const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
   const currentFieldKey = useSelector((state) => state.contacts.currentFieldKey);
   const isSaveBtnDissabled = useSelector((state) => state.contacts.isSaveBtnDissabled);
   const isUndoBtnDissabled = useSelector((state) => state.contacts.isUndoBtnDissabled);
   const isRedoBtnDissabled = useSelector((state) => state.contacts.isRedoBtnDissabled);
-  const { phone: isPhoneValid, email: isEmailValid } = useSelector((state) => state.contacts.isInputsValid);
   const fieldTitle = useSelector((state) => state.contacts.additionalFieldTitle);
   const fieldValue = useSelector((state) => state.contacts.additionalFieldValue);
-  const fieldType = useSelector((state) => state.contacts.additionalFieldType);
   const currentContactHistory = useSelector((state) => state.contacts.currentContactHistory);
 
   const clearAddFieldValues = useCallback(() => reduxDispatch(clrAddFieldValues()), [reduxDispatch]);
 
   const contactFromList = contactsList.filter(contact => contact.id === currentContact.id)[0];
-
-  useEffect(() => {
-    reduxDispatch(setAddFieldType({ additionalFieldType: getFieldType(fieldTitle) }));
-  }, [reduxDispatch, fieldTitle]);
 
   useEffect(() => {
     if (currentContactHistory.prev.length) {
@@ -216,60 +208,10 @@ const ContactInfoScreen = ({ history }) => {
         }}
         componentUnmountFunc = {clearAddFieldValues}
       >
-        <label
-          className={styles.label}
-          data-is-uniq={!isFieldExist}
-          data-is-empty={fieldTitle ? 'false' : 'true'}
-        >
-          Field title:
-          <input
-            className={styles.input}
-            type='text'
-            placeholder='Field title'
-            name='fieldTitle'
-            value={fieldTitle}
-            data-is-uniq={!isFieldExist}
-            data-is-empty={fieldTitle ? 'false' : 'true'}
-            onChange = {(e) => {
-              reduxDispatch(addFieldTitle({ additionalFieldTitle: e.target.value }));
-              if (Object.keys(currentContact).map(key => key.toLowerCase().trim()).includes(e.target.value.toLowerCase().trim())) {
-                reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: true }));
-                return;
-              }
-              if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
-              if (fieldType === 'other' || !fieldValue) {
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: e.target.value ? false : true }));
-                return;
-              }
-              fieldType === 'email' ?
-                reduxDispatch(changeEmailValid(addFieldEmailValidator(fieldValue, 'modal1', fieldTitle, isFieldExist))) :
-                reduxDispatch(changePhoneValid(addFieldPhoneValidator(fieldValue, 'modal1', fieldTitle, isFieldExist)));
-            }}
-          />
-        </label>
-        <label
-          className={styles.label}
-          data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
-          data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
-        >
-          Field value:
-          <input
-            className={styles.input}
-            type='text'
-            placeholder='Field value'
-            name='fieldValue'
-            value={fieldValue}
-            data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
-            data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
-            onChange = {(e) => {
-              reduxDispatch(addFieldValue({ additionalFieldValue: e.target.value }));
-              if (fieldType === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal1', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
-              if (fieldType === 'email') reduxDispatch(changeEmailValid(addFieldEmailValidator(e.target.value, 'modal1', fieldTitle, isFieldExist)));
-              if (fieldType === 'phone') reduxDispatch(changePhoneValid(addFieldPhoneValidator(e.target.value, 'modal1', fieldTitle, isFieldExist)));
-            }}
-          />
-        </label>
+        <AddEditForm
+          modalKey = {'modal1'}
+          target = {currentContact}
+        />
       </Modal>
 
       <Modal
@@ -279,15 +221,18 @@ const ContactInfoScreen = ({ history }) => {
         acceptBtnHandler = {() => {
           reduxDispatch(deleteFieldFromCurrentContact({ key: currentFieldKey }));
           reduxDispatch(changeCurrentContactStateHistory());
+          reduxDispatch(setCurrentFieldKey({ currentFieldKey: '' }));
           reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
         }}
         acceptBtnTitle = {'Yes'}
         rejectBtnHandler = {() => {
+          reduxDispatch(setCurrentFieldKey({ currentFieldKey: '' }));
           reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));}}
         rejectBtnTitle = {'No'}
         closeModalHandler = {() => {
+          reduxDispatch(setCurrentFieldKey({ currentFieldKey: '' }));
           reduxDispatch(changeModalStatus({ key: 'modal2', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal2', acceptBtnStatus: true }));
         }}
@@ -302,75 +247,28 @@ const ContactInfoScreen = ({ history }) => {
         acceptBtnHandler = {() => {
           reduxDispatch(editCurrentContactField({ fieldCurrentTitle: currentFieldKey, fieldNewTitle: fieldTitle, fieldValue: fieldValue }));
           reduxDispatch(changeCurrentContactStateHistory());
+          reduxDispatch(setCurrentFieldKey({ currentFieldKey: '' }));
           reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
         acceptBtnTitle = {'Ok'}
         rejectBtnHandler = {() => {
+          reduxDispatch(setCurrentFieldKey({ currentFieldKey: '' }));
           reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
         rejectBtnTitle = {'Cancel'}
         closeModalHandler = {() => {
+          reduxDispatch(setCurrentFieldKey({ currentFieldKey: '' }));
           reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
         componentUnmountFunc = {clearAddFieldValues}
       >
-        <label
-          className={styles.label}
-          data-is-uniq={!isFieldExist}
-          data-is-empty={fieldTitle ? 'false' : 'true'}
-        >
-          Field title:
-          <input
-            className={styles.input}
-            type='text'
-            placeholder='Field title'
-            name='fieldTitle'
-            value={fieldTitle}
-            data-is-uniq={!isFieldExist}
-            data-is-empty={fieldTitle ? 'false' : 'true'}
-            onChange = {(e) => {
-              reduxDispatch(addFieldTitle({ additionalFieldTitle: e.target.value }));
-              if (Object.keys(currentContact).map(key => key.toLowerCase().trim()).includes(e.target.value.toLowerCase().trim()) && e.target.value !== currentFieldKey) {
-                reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
-                return;
-              }
-              if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
-              if (fieldType === 'other' || !fieldValue) {
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: e.target.value ? false : true }));
-                return;
-              }
-              fieldType === 'email' ?
-                reduxDispatch(changeEmailValid(addFieldEmailValidator(fieldValue, 'modal3', fieldTitle, isFieldExist))) :
-                reduxDispatch(changePhoneValid(addFieldPhoneValidator(fieldValue, 'modal3', fieldTitle, isFieldExist)));
-            }}
-          />
-        </label>
-        <label
-          className={styles.label}
-          data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
-          data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
-        >
-            Field value:
-          <input
-            className={styles.input}
-            type='text'
-            placeholder='Field value'
-            name='fieldValue'
-            value={fieldValue}
-            data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
-            data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
-            onChange = {(e) => {
-              reduxDispatch(addFieldValue({ additionalFieldValue: e.target.value }));
-              if (fieldType === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
-              if (fieldType === 'email') reduxDispatch(changeEmailValid(addFieldEmailValidator(e.target.value, 'modal3', fieldTitle, isFieldExist)));
-              if (fieldType === 'phone') reduxDispatch(changePhoneValid(addFieldPhoneValidator(e.target.value, 'modal3', fieldTitle, isFieldExist)));
-            }}
-          />
-        </label>
+        <AddEditForm
+          modalKey = {'modal3'}
+          target = {currentContact}
+        />
       </Modal>
 
       <Modal
@@ -474,6 +372,10 @@ const ContactInfoScreen = ({ history }) => {
 
     </div>
   );
+};
+
+ContactInfoScreen.propTypes = {
+  history: PropTypes.object.isRequired,
 };
 
 export default ContactInfoScreen;

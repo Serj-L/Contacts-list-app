@@ -4,7 +4,7 @@ function Header() {
   return (
     <header id='header'>
       <div className={styles.wrapper}>
-        <h1 className={styles.title}>Contacts List</h1>
+        <h1 className={styles.title}>Contacts List App</h1>
       </div>
     </header>
   );

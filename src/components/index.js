@@ -4,6 +4,7 @@ export { default as Container } from './Container/Container';
 export { default as Modal } from './Modal/Modal';
 export { default as Form } from './Form/Form';
 export { default as AddContact } from './AddContact/AddContact';
+export { default as AddEditForm } from './AddEditForm/AddEditForm';
 export { default as Snackbar } from './Snackbar/Snackbar';
 export { default as ScrollTop } from './ScrollTop/ScrollTop';
 export { default as IconShevronUp } from './Icons/IconShevronUp';

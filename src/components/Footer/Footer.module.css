@@ -6,11 +6,12 @@ footer {
 .wrapper{
   width: 100%;
   text-align: center;
-  padding: 20px 0;
+  padding: 15px 0;
 }
 
 .copyright {
   display: block;
   font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
   color: #ffffff;
 }

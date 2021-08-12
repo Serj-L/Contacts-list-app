@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { Modal } from '../../components';
+import { Modal, AddEditForm } from '../../components';
 
 import {
   changeModalStatus,
@@ -10,10 +10,6 @@ import {
   changePhoneValid,
   changeEmailValid,
   changeModalAcceptBtnStatus,
-  changeFieldExistStatus,
-  addFieldTitle,
-  addFieldValue,
-  setAddFieldType,
   clrAddFieldValues,
   addFieldToForm,
   deleteFieldFromForm,
@@ -24,22 +20,17 @@ import {
   formValidator,
   emailValidator,
   phoneValidator,
-  addFieldEmailValidator,
-  addFieldPhoneValidator,
-  getFieldType,
 } from '../../utils/utils';
 
 import styles from './Form.module.css';
 
-function Form() {
+const Form = () => {
   const reduxDispatch = useDispatch();
   const isModalOpen = useSelector((state) => state.contacts.isModalOpen);
   const contact = useSelector((state) => state.contacts.addContactInfo);
   const { phone: isPhoneValid, email: isEmailValid } = useSelector((state) => state.contacts.isInputsValid);
-  const isFieldExist = useSelector((state) => state.contacts.isFieldExist);
   const fieldTitle = useSelector((state) => state.contacts.additionalFieldTitle);
   const fieldValue = useSelector((state) => state.contacts.additionalFieldValue);
-  const fieldType = useSelector((state) => state.contacts.additionalFieldType);
   const currentFieldKey = useSelector((state) => state.contacts.currentFieldKey);
   const additionalFields = useSelector((state) => state.contacts.additionalFields);
 
@@ -48,10 +39,6 @@ function Form() {
       reduxDispatch(clearContactInfo());
     };
   }, [reduxDispatch]);
-
-  useEffect(() => {
-    reduxDispatch(setAddFieldType({ additionalFieldType: getFieldType(fieldTitle) }));
-  }, [reduxDispatch, fieldTitle]);
 
   const clearAddFieldValues = useCallback(() => reduxDispatch(clrAddFieldValues()), [reduxDispatch]);
 
@@ -173,17 +160,22 @@ function Form() {
       >
         Add field
       </button>
-      {<Modal
+
+      <Modal
         isModalActive = {isModalOpen.modal3}
         modalKey = {'modal3'}
         modalTitle = {'Add new field'}
         acceptBtnHandler = {() => {
           reduxDispatch(addFieldToForm({ fieldTitle: fieldTitle, fieldValue: fieldValue }));
+          reduxDispatch(changeEmailValid(emailValidator(contact.email, contact.phone, isPhoneValid, contact.name, contact.surname, 'modal1')));
+          reduxDispatch(changePhoneValid(phoneValidator(contact.phone, contact.email, isEmailValid, contact.name, contact.surname, 'modal1')));
           reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
         acceptBtnTitle = {'Add field'}
         rejectBtnHandler = {() => {
+          reduxDispatch(changeEmailValid(emailValidator(contact.email, contact.phone, isPhoneValid, contact.name, contact.surname, 'modal1')));
+          reduxDispatch(changePhoneValid(phoneValidator(contact.phone, contact.email, isEmailValid, contact.name, contact.surname, 'modal1')));
           reduxDispatch(changeModalStatus({ key: 'modal3', modalStatus: false }));
           reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
         }}
@@ -194,61 +186,11 @@ function Form() {
         }}
         componentUnmountFunc = {clearAddFieldValues}
       >
-        <label
-          className={styles.label}
-          data-is-uniq={!isFieldExist}
-          data-is-empty={fieldTitle ? 'false' : 'true'}
-        >
-          Field title:
-          <input
-            className={styles.input}
-            type='text'
-            placeholder='Field title'
-            name='fieldTitle'
-            value={fieldTitle}
-            data-is-uniq={!isFieldExist}
-            data-is-empty={fieldTitle ? 'false' : 'true'}
-            onChange = {(e) => {
-              reduxDispatch(addFieldTitle({ additionalFieldTitle: e.target.value }));
-              if (Object.keys(contact).map(key => key.toLowerCase().trim()).includes(e.target.value.toLowerCase().trim())) {
-                reduxDispatch(changeFieldExistStatus({ fieldExistStatus: true }));
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: true }));
-                return;
-              }
-              if (isFieldExist) reduxDispatch(changeFieldExistStatus({ fieldExistStatus: false }));
-              if (fieldType === 'other' || !fieldValue) {
-                reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: e.target.value ? false : true }));
-                return;
-              }
-              fieldType === 'email' ?
-                reduxDispatch(changeEmailValid(addFieldEmailValidator(fieldValue, 'modal3', fieldTitle, isFieldExist))) :
-                reduxDispatch(changePhoneValid(addFieldPhoneValidator(fieldValue, 'modal3', fieldTitle, isFieldExist)));
-            }}
-          />
-        </label>
-        <label
-          className={styles.label}
-          data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
-          data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
-        >
-          Field value:
-          <input
-            className={styles.input}
-            type='text'
-            placeholder='Field value'
-            name='fieldValue'
-            value={fieldValue}
-            data-is-valid={fieldType === 'email' ? isEmailValid : fieldType === 'phone' ? isPhoneValid : ''}
-            data-is-empty={fieldType === 'email' || fieldType === 'phone' ? fieldValue ? 'false' : 'true' : ''}
-            onChange = {(e) => {
-              reduxDispatch(addFieldValue({ additionalFieldValue: e.target.value }));
-              if (fieldType === 'other') reduxDispatch(changeModalAcceptBtnStatus({ key: 'modal3', acceptBtnStatus: (e.target.value && fieldTitle && !isFieldExist) || (fieldTitle && !isFieldExist) ? false : true }));
-              if (fieldType === 'email') reduxDispatch(changeEmailValid(addFieldEmailValidator(e.target.value, 'modal3', fieldTitle, isFieldExist)));
-              if (fieldType === 'phone') reduxDispatch(changePhoneValid(addFieldPhoneValidator(e.target.value, 'modal3', fieldTitle, isFieldExist)));
-            }}
-          />
-        </label>
-      </Modal>}
+        <AddEditForm
+          modalKey = {'modal3'}
+          target = {contact}
+        />
+      </Modal>
 
       <Modal
         isModalActive = {isModalOpen.modal4}
@@ -274,6 +216,6 @@ function Form() {
 
     </div>
   );
-}
+};
 
 export default Form;
