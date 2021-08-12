@@ -7,16 +7,16 @@ export const RouterView = () => {
     <Switch>
       <Route
         exact
-        path="/"
+        path='/'
         component={ContactsListScreen}
       />
 
       <Route
-        path="/info"
+        path='/info'
         component={ContactInfoScreen}
       />
 
-      <Route path="*">
+      <Route path='*'>
         <div>404 Not Found</div>
       </Route>
     </Switch>
