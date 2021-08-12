@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/Contacts-list-app/static/css/main.183afe22.chunk.css",
+    "main.js": "/Contacts-list-app/static/js/main.21989d43.chunk.js",
+    "main.js.map": "/Contacts-list-app/static/js/main.21989d43.chunk.js.map",
+    "runtime-main.js": "/Contacts-list-app/static/js/runtime-main.579131f6.js",
+    "runtime-main.js.map": "/Contacts-list-app/static/js/runtime-main.579131f6.js.map",
+    "static/js/2.6106e421.chunk.js": "/Contacts-list-app/static/js/2.6106e421.chunk.js",
+    "static/js/2.6106e421.chunk.js.map": "/Contacts-list-app/static/js/2.6106e421.chunk.js.map",
+    "index.html": "/Contacts-list-app/index.html",
+    "static/css/main.183afe22.chunk.css.map": "/Contacts-list-app/static/css/main.183afe22.chunk.css.map",
+    "static/js/2.6106e421.chunk.js.LICENSE.txt": "/Contacts-list-app/static/js/2.6106e421.chunk.js.LICENSE.txt",
+    "static/media/ContactsListScreen.module.css": "/Contacts-list-app/static/media/check-box-icon.d6c14971.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.579131f6.js",
+    "static/js/2.6106e421.chunk.js",
+    "static/css/main.183afe22.chunk.css",
+    "static/js/main.21989d43.chunk.js"
+  ]
+}
