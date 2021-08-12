@@ -102,7 +102,7 @@ const ContactInfoScreen = ({ history }) => {
         Back to contacts list
         </button>
         <h1 className={styles.title}>Contact {currentContact.name} {currentContact.surname} details</h1>
-        <div >
+        <div>
           {Object.entries(currentContact).map(contact => {
             if (contact[0] === 'selected' || contact[0] === 'id') return null;
             return (

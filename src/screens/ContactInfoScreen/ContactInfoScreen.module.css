@@ -154,3 +154,23 @@
 .hrLine {
   margin: 10px 0;
 }
+
+/* adaptive */
+@media (max-width: 768px) {
+  .title {
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 500px) {
+  .addInputsWrapper {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .contactInfoInput,
+  .input {
+    margin: 10px 0;
+  }
+}
+/* adaptive */

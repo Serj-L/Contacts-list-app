@@ -23,7 +23,12 @@ const Container = ({ children }) => {
   }, [contactsList]);
 
   useEffect(() => {
+    const windowResizeHandler = () => reduxDispatch(setScrollBarWidth({ scrollBarWidth: `${getScrollBarWidth()}px` }));
+
     reduxDispatch(setScrollBarWidth({ scrollBarWidth: `${getScrollBarWidth()}px` }));
+    window.addEventListener('resize', windowResizeHandler);
+
+    return () => window.removeEventListener('resize', windowResizeHandler);
   }, [reduxDispatch]);
 
   useEffect(() => {
