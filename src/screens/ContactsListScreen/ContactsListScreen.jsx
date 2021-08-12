@@ -52,7 +52,7 @@ const ContactsListScreen = ({ history }) => {
         <div className={styles.selectBtns}>
           <button
             className={styles.btn}
-            disabled={allSelected}
+            disabled={allSelected || !contactsList.length ? true : false}
             onClick = {() => {
               reduxDispatch(setAllContactsSelected());
             }}
@@ -84,7 +84,7 @@ const ContactsListScreen = ({ history }) => {
 
       </div>
       <div className={styles.contactsList}>
-        {contactsList ?
+        {contactsList.length ?
           contactsList.map((contact, idx) => {
             return (
               <div
@@ -133,7 +133,7 @@ const ContactsListScreen = ({ history }) => {
                 </div>
               </div>
             );
-          }) : <h3>Contats list is empty</h3>
+          }) : <h3 className={styles.emptyListAlert}>Your contacts list is empty. Press `Add new contact` button to start adding contacts.</h3>
         }
       </div>
 

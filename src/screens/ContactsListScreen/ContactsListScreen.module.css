@@ -148,6 +148,12 @@
   cursor: pointer;
 }
 
+.emptyListAlert {
+  padding-top: 30px;
+  font-size: 20px;
+  text-align: center;
+}
+
 /* adaptive */
 @media (max-width: 690px) {
   .controlsWrapper {
